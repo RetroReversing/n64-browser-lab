@@ -18,6 +18,7 @@
     "@codemirror/state": "^6.7.6",
     "@codemirror/view": "^6.43.15",
     "buffer": "6.0.3",
+    "diff": "^9.0.0",
     "memfs": "4.80.0",
     "path-browserify": "1.0.1",
     "romdev-toolchain-decomp-gcc": "0.1.0",

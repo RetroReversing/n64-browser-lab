@@ -1,21 +1,30 @@
 import {elfFunction,digest,automaticSymbols} from './formats.js';
 import {createHost} from './host.js';
-const host=createHost(text=>postMessage({type:'log',text}));
+let rawCapture=null;
+const host=createHost(text=>{if(rawCapture!==null)rawCapture+=text;else postMessage({type:'log',text});});
 globalThis.__n64Process=host.process;
 const wasmCache=new Map();
 let toolManifest;
-async function run(tool,args){
+async function run(tool,args,capture=false){
+ rawCapture=capture?"":null;let output="";const print=t=>{if(capture)output+=t+"\n";else postMessage({type:"log",text:t+"\n"});};
  postMessage({type:'log',text:`\n$ ${tool} ${args.join(' ')}\n`});
  if(!toolManifest){const response=await fetch('/toolchains/manifest.json');if(!response.ok)throw Error('Missing toolchain manifest. Run npm run stage.');toolManifest=await response.json();}
  if(!wasmCache.has(tool)){const r=await fetch(`/toolchains/${tool}.wasm`);if(!r.ok)throw Error(`Missing ${tool} WASM. Run npm run stage.`);const bytes=new Uint8Array(await r.arrayBuffer());if(await digest(bytes)!==toolManifest[tool]?.sha256)throw Error(`Toolchain integrity check failed for ${tool}.`);wasmCache.set(tool,bytes);}
  const {default:factory}=await import(/* @vite-ignore */ `/toolchains/${tool}.mjs`);
  let exit=0;
- const mod=await factory({wasmBinary:wasmCache.get(tool),noInitialRun:true,print:t=>postMessage({type:'log',text:t+'\n'}),printErr:t=>postMessage({type:'log',text:t+'\n'}),quit:code=>{exit=code;}});
+ const mod=await factory({wasmBinary:wasmCache.get(tool),noInitialRun:true,print,printErr:t=>postMessage({type:'log',text:t+'\n'}),quit:code=>{exit=code;}});
  host.process.exitCode=0;
  try{const result=mod.callMain(args);if(typeof result==='number')exit=result;}catch(e){if(typeof e.status==='number')exit=e.status;else throw e;}
- exit=exit||host.process.exitCode;if(exit)throw Error(`${tool} exited ${exit}. See tool output.`);
+ exit=exit||host.process.exitCode;if(exit)throw Error(`${tool} exited ${exit}. See tool output.`);const captured=output+(rawCapture||'');rawCapture=null;return captured;
 }
 onmessage=async({data})=>{try{
+ if(data.type==='diff'){
+  const args=['-D','-z','-b','binary','-m','mips:4300','-EB',`--adjust-vma=${data.address}`];
+  host.fs.writeFileSync('/work/target.bin',new Uint8Array(data.target));host.fs.writeFileSync('/work/candidate.bin',new Uint8Array(data.candidate));
+  const target=await run('objdump',[...args,'/work/target.bin'],true),candidate=await run('objdump',[...args,'/work/candidate.bin'],true);
+  postMessage({type:'diff',id:data.id,target,candidate});return;
+ }
+
  const {id,source,address=0x80000400,optimization='-O2',smallData='-G0',functionName='candidate',symbols={},context='',flags=null,taskId=null}=data;
  const accepted=new Set(['-G0','-G8','-mips3','-mgp32','-mfp32','-O0','-O1','-O2','-O3','-g','-g0','-g1','-g2','-g3']);
  if(flags!==null&&(!Array.isArray(flags)||flags.some(f=>!accepted.has(f))))throw Error('Unsupported host compiler flags.');
@@ -39,4 +48,4 @@ onmessage=async({data})=>{try{
  const bytes=fn.bytes;
  const elf=new Uint8Array(host.fs.readFileSync('/work/output.elf'));
  postMessage({type:'result',id,assembly,bytes,elf,textBytes,functionAddress:fn.address,toolchain:toolManifest,request:{source,context,flags,taskId,address,optimization,smallData,functionName,symbols:resolvedSymbols}},[bytes.buffer,elf.buffer]);
- }catch(e){postMessage({type:'error',id:data.id,error:e.stack||String(e)});}};
+ }catch(e){rawCapture=null;postMessage({type:'error',id:data.id,error:e.stack||String(e)});}};

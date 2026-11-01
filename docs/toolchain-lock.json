@@ -28,5 +28,11 @@
     "file": "mips-linux-gnu-objcopy",
     "sha256": "18f77fbec19387272f661eae11f3a99e3eed80da5bf2cc28014923d5eda99e19",
     "bytes": 894845
+  },
+  "objdump": {
+    "package": "romdev-toolchain-mips-gcc",
+    "file": "mips-linux-gnu-objdump",
+    "sha256": "68c314942968b8cc24ecf5605c370deb3d2d11adc7759feb14d97f720d665d63",
+    "bytes": 1362858
   }
 }

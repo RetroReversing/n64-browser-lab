@@ -77,3 +77,5 @@ The token is saved in localStorage to reconnect after a browser restart and is s
 The initial bridge accepts plain C (no source preprocessor directives, assembly or attributes), self-contained host declarations, and an allowlisted KMC flag set including debug levels. Native imports, other toolchains and unrestricted files/commands are unavailable. The browser can still compile standalone examples without pairing.
 
 Linker symbol addresses are passed through the generated linker script, avoiding oversized WASM command-line argument stacks for full project symbol tables.
+
+The instruction diff runs pinned GNU objdump WASM locally over the selected ROM range and linked candidate bytes. Instruction words determine equality; colored rows show operand changes, changed instructions, and moved-word hints. Long identical runs can be expanded. This view does not replace the desktop host’s authoritative match score.

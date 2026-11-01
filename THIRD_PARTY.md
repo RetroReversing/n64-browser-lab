@@ -23,10 +23,10 @@ Within `packages/romdevtools/scripts/`:
 - `patches/kmc-gcc-2.7.2-wasm.patch`: Emscripten compatibility and explicit driver spawning hook.
 - `patches/kmc-binutils-2.6-wasm.patch`: reference-host-compatible obstack/fragment layout.
 - `emcc-replay.mjs`: recompiles the logged build commands with Emscripten.
-- `build-mips-linux-binutils-wasm.sh`: WASM linker/objcopy build.
+- `build-mips-linux-binutils-wasm.sh`: WASM linker/objcopy/objdump build.
 
 The upstream recipes use Emscripten 4.0.18. This application consumes their pinned published artifacts and records exact binary hashes in `docs/toolchain-lock.json`; `npm ci` also verifies npm package integrity using the lockfile. Rebuilding tools from source can require a compatible Linux build environment and GNU build utilities; running this POC does not.
 
-Our only generated-glue modification is the explicit `process` facade binding in `scripts/stage-tools.mjs`. The compiler/assembler/linker WASM bytes are unchanged. The complete application adapter source and staging script are in this repository.
+Our only generated-glue modification is the explicit `process` facade binding in `scripts/stage-tools.mjs`. The compiler/assembler/linker/disassembler WASM bytes are unchanged. The complete application adapter source and staging script are in this repository.
 
 Runtime dependencies include memfs (Apache-2.0), path-browserify and buffer (MIT), and Emscripten runtime portions under their upstream MIT/NCSA terms. Vite, Playwright and build polyfills retain their package licenses. Package metadata contains the complete dependency inventory. The mixed-license romdev npm package also contains unrelated tools (including AGPL tools); those files are neither loaded nor copied into this POC's build.

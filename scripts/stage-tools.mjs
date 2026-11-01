@@ -1,6 +1,6 @@
 import {mkdir,readFile,writeFile,copyFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
-const tools={cpp:['romdev-toolchain-decomp-gcc','kmc-2.7.2/cpp'],cc1:['romdev-toolchain-decomp-gcc','kmc-2.7.2/cc1'],as:['romdev-toolchain-decomp-gcc','kmc-2.7.2/as'],ld:['romdev-toolchain-mips-gcc','mips-linux-gnu-ld'],objcopy:['romdev-toolchain-mips-gcc','mips-linux-gnu-objcopy']};
+const tools={objdump:['romdev-toolchain-mips-gcc','mips-linux-gnu-objdump'],cpp:['romdev-toolchain-decomp-gcc','kmc-2.7.2/cpp'],cc1:['romdev-toolchain-decomp-gcc','kmc-2.7.2/cc1'],as:['romdev-toolchain-decomp-gcc','kmc-2.7.2/as'],ld:['romdev-toolchain-mips-gcc','mips-linux-gnu-ld'],objcopy:['romdev-toolchain-mips-gcc','mips-linux-gnu-objcopy']};
 const pinned=JSON.parse(await readFile('docs/toolchain-lock.json','utf8'));
 await mkdir('public/toolchains',{recursive:true});let manifest={};
 for(const [name,[pkg,file]] of Object.entries(tools)){
@@ -15,4 +15,4 @@ for(const [name,[pkg,file]] of Object.entries(tools)){
  manifest[name]={package:pkg,file,sha256:createHash('sha256').update(wasm).digest('hex'),bytes:wasm.length};
 }
 await writeFile('public/toolchains/manifest.json',JSON.stringify(manifest,null,2));
-console.log('Staged five pinned WASM tools (no compiler service).');
+console.log('Staged six pinned WASM tools (no compiler service).');
