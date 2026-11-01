@@ -12,6 +12,11 @@
     "test:browser": "node tests/browser.mjs"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-cpp": "^6.0.3",
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.15",
     "buffer": "6.0.3",
     "memfs": "4.80.0",
     "path-browserify": "1.0.1",
