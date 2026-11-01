@@ -1,0 +1,32 @@
+{
+  "cpp": {
+    "package": "romdev-toolchain-decomp-gcc",
+    "file": "kmc-2.7.2/cpp",
+    "sha256": "a1eb6483fd3b2f9be2f8f91f66cdbdce14d9a01abf28cd3afb11ebb77fee542f",
+    "bytes": 115050
+  },
+  "cc1": {
+    "package": "romdev-toolchain-decomp-gcc",
+    "file": "kmc-2.7.2/cc1",
+    "sha256": "e1cc6e758f09a919c546324d6556ac9ba5287b3a0747a6247e8fdce2e9fee42f",
+    "bytes": 1520519
+  },
+  "as": {
+    "package": "romdev-toolchain-decomp-gcc",
+    "file": "kmc-2.7.2/as",
+    "sha256": "e5eb34e2070528bb4f5d61bcb80b2f3dd5473cf772c03c0601d139b159abc4ae",
+    "bytes": 404156
+  },
+  "ld": {
+    "package": "romdev-toolchain-mips-gcc",
+    "file": "mips-linux-gnu-ld",
+    "sha256": "6e13a33c10329fa8406e03cbb32b1427a0ce711ed651998f2a2900f75d792b6d",
+    "bytes": 3406676
+  },
+  "objcopy": {
+    "package": "romdev-toolchain-mips-gcc",
+    "file": "mips-linux-gnu-objcopy",
+    "sha256": "18f77fbec19387272f661eae11f3a99e3eed80da5bf2cc28014923d5eda99e19",
+    "bytes": 894845
+  }
+}
