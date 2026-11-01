@@ -23,3 +23,11 @@ test('assembly view keeps only the selected function including internal labels',
  assert.equal(functionAssembly(asm,'candidate'),'.ent candidate\ncandidate:\n$L2:\njr $31\n.end candidate');
  assert.throws(()=>functionAssembly(asm,'missing'),/boundary/);
 });
+
+import {annotatedFunctionAssembly} from '../src/formats.js';
+test('C annotations use source snapshot and subtract host context lines',()=>{
+ const request={context:'typedef int Value;',source:'int candidate(void) {\n return 7;\n}'};
+ const assembly='.ent candidate\ncandidate:\n.section .line\n.4byte 3 # /input.c:3\n.previous\n addiu $2,$0,7\n.end candidate';
+ assert.match(annotatedFunctionAssembly(assembly,'candidate',request),/addiu.*# C:2 return 7;/);
+ assert.doesNotMatch(annotatedFunctionAssembly('.ent candidate\ncandidate:\n jr $31\n.end candidate','candidate',request),/# C:/);
+});

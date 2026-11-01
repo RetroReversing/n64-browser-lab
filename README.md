@@ -79,3 +79,5 @@ The initial bridge accepts plain C (no source preprocessor directives, assembly 
 Linker symbol addresses are passed through the generated linker script, avoiding oversized WASM command-line argument stacks for full project symbol tables.
 
 The instruction diff runs pinned GNU objdump WASM locally over the selected ROM range and linked candidate bytes. Instruction words determine equality; colored rows show operand changes, changed instructions, and moved-word hints. Long identical runs can be expanded. This view does not replace the desktop host’s authoritative match score.
+
+Assembly and the candidate side of the instruction diff display `# C:line source` comments when the selected compiler flags emit GCC line information. Comments use the compiled source snapshot, excluding host context lines. Optimized code may combine/reorder source statements; this is compiler attribution, not a one-to-one causal mapping. Missing debug information leaves instructions unannotated, without changing compiler flags or inventing target source.

@@ -55,3 +55,25 @@ export function functionAssembly(assembly,name){
  if(end<0)throw Error(`Incomplete assembly boundary for ${name}.`);
  return lines.slice(start,end+1).join('\n');
 }
+// GCC 2.7.2 emits DWARF v1 .line records: length/base, then line/column/address-offset.
+export function sourceLineMap(input,request){
+ const bytes=new Uint8Array(input),d=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
+ if(bytes.length<52||d.getUint32(0)!==0x7f454c46)return [];
+ const sh=d.getUint32(32),stride=d.getUint16(46),count=d.getUint16(48),strings=d.getUint16(50);
+ const section=i=>{const p=sh+i*stride;if(i>=count||p+40>bytes.length)throw Error('Invalid ELF section.');return {name:d.getUint32(p),offset:d.getUint32(p+16),size:d.getUint32(p+20)};};
+ const names=section(strings),source=(request.context+'\n'+request.source).split('\n'),sourceStart=request.context.split('\n').length+1,result=[];
+ for(let i=0;i<count;i++){const sec=section(i),start=names.offset+sec.name,end=bytes.indexOf(0,start);if(decoder.decode(bytes.subarray(start,end))!=='.line')continue;
+ if(sec.offset+sec.size>bytes.length)throw Error('Invalid ELF line table.');
+ for(let p=sec.offset;p+8<=sec.offset+sec.size;){const length=d.getUint32(p),base=d.getUint32(p+4);if(length<8||p+length>sec.offset+sec.size)break;for(let q=p+8;q+10<=p+length;q+=10){const line=d.getUint32(q),address=(base+d.getUint32(q+6))>>>0;if(line>=sourceStart&&line<=source.length){const text=source[line-1].trim();if(text)result.push({address,line:line-sourceStart+1,text});}}p+=length;}}
+ return result.sort((a,b)=>a.address-b.address);
+}
+export function sourceAtAddress(map,address){let found=null;for(const item of map){if(item.address>address)break;found=item;}return found;}
+export function annotatedFunctionAssembly(assembly,name,request){
+ const selected=functionAssembly(assembly,name),source=(request.context+'\n'+request.source).split('\n'),sourceStart=request.context.split('\n').length+1;
+ let current=null;
+ // Consume preceding line markers too, as the first marker can precede .ent.
+ const prefix=assembly.slice(0,assembly.indexOf(selected));
+ const marker=line=>{const m=/^\s*\.4byte\s+(\d+)\s*#\s*.*input\.c:(\d+)/.exec(line)||/^\s*\.loc\s+\d+\s+(\d+)/.exec(line);if(m){const n=Number(m[1]);current=n>=sourceStart&&n<=source.length?{line:n-sourceStart+1,text:source[n-1].trim()}:null;}};
+ prefix.split('\n').forEach(marker);
+ return selected.split('\n').map(line=>{marker(line);return current?.text&&/^\s*[A-Za-z][\w.]*\s+[^:]/.test(line)&&!/^\s*\w+:/.test(line)?`${line}\t# C:${current.line} ${current.text}`:line;}).join('\n');
+}
