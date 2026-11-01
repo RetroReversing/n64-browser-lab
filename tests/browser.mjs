@@ -27,7 +27,7 @@ const scratch=await mkdtemp(join(tmpdir(),'n64-browser-test-'));try{
  const ext=await page.evaluate(()=>lab.compile({source:'extern int helper(int); int candidate(int x){return helper(x)+1;}',functionName:'candidate',symbols:{helper:0x80001000}}));assert(ext.bytes.some((_,i)=>i%4===0&&ext.bytes[i]===0x0c&&ext.bytes[i+2]===0x04));
  await assert.rejects(page.evaluate(()=>lab.compile({source:'int candidate(void){ return broken syntax; }',functionName:'candidate'})),/cc1 exited/);
  await assert.rejects(page.evaluate(()=>lab.compile({source:'extern int missing(void); int candidate(void){return missing();}',functionName:'candidate'})),/ld exited/);
- await page.reload();await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('Saved ROM restored'));assert.match(await page.locator('#romTitle').textContent(),/HOMEMADE/);
+ await page.reload();await page.waitForFunction(()=>document.querySelector('#romTitle').textContent.includes('HOMEMADE'));assert.match(await page.locator('#romTitle').textContent(),/HOMEMADE/);
  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
  assert.deepEqual(errors,[]);assert(requests.every(r=>r.method==='GET'));assert(requests.every(r=>new URL(r.url).hostname==='127.0.0.1'));
  // Selecting a host function loads source and authoritative compiler flags into the editor.

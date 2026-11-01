@@ -9,7 +9,7 @@ let worker,rom,result,busy=false,serial=0,activeTask=null,bridgeBusy=false,paire
 const bridge=createBridge();
 
 function log(text){$('log').textContent+=text;$('log').scrollTop=$('log').scrollHeight;}
-function status(text,kind=''){ $('status').textContent=text;$('status').dataset.kind=kind; }
+function status(text,kind=''){ $('status').textContent=text;$('status').hidden=!text;$('status').dataset.kind=kind; }
 function controls(){cEditor.setDisabled(busy);for(const id of ['compile','optimization','smallData','symbols','romFile','offset'])$(id).disabled=busy;$('cancel').hidden=!busy;$('progress').hidden=!busy;$('find').disabled=busy||!rom||!result;$('compare').disabled=busy||!rom||!result;$('download').disabled=busy||!result;$('proposal').disabled=busy||!rom||!result;
  for(const id of ['optimization','smallData'])$(id).disabled=busy||!!activeTask;
  $('hostSubmit').disabled=bridgeBusy||busy||!activeTask||result?.request?.taskId!==activeTask?.id;
@@ -55,7 +55,7 @@ function disconnectHost(){clearTimeout(searchTimer);bridge.disconnect();activeTa
 $('forgetConnection').onclick=()=>{try{localStorage.removeItem('n64-bridge');$('bridgeStatus').textContent=paired?'Saved connection forgotten. This tab stays connected until you disconnect.':'Saved connection forgotten. Pair with a new code to reconnect.';}catch{$('bridgeStatus').textContent='Browser storage could not be cleared.';}};
 
 // Restore binary ROM before reconnecting, so fetched tasks can be checked locally.
-(async()=>{try{const buffer=await romStorage('get');if(buffer&&!rom){const loaded=normalizeRom(buffer);loaded.sha256=await digest(loaded.bytes);if(!rom){rom=loaded;showRom();status('Saved ROM restored from this browser.','good');}}}catch{status('Saved ROM could not be restored. Choose the ROM again.');}
+(async()=>{try{const buffer=await romStorage('get');if(buffer&&!rom){const loaded=normalizeRom(buffer);loaded.sha256=await digest(loaded.bytes);if(!rom){rom=loaded;showRom();status('');}}}catch{status('Saved ROM could not be restored. Choose the ROM again.');}
  let saved;try{saved=JSON.parse(localStorage.getItem('n64-bridge')||'null');}catch{}
  if(saved){$('hostUrl').value=saved.base;await bridgeAction('Reconnecting to the desktop app…',async()=>{try{await bridge.restore(saved);pairedControls(true);await loadFunctions();}catch(e){bridge.disconnect();pairedControls(false);$('bridgeStatus').textContent=`Could not restore the saved connection: ${e.message} Create a new pairing code if the session has expired or the desktop app restarted.`;}});}
 })();
