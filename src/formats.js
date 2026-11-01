@@ -46,3 +46,12 @@ export function functionMetrics(fn){
  const percent=fn.n_insns>0?Math.max(0,Math.min(100,100*(1-score/(fn.n_insns*100)))):null;
  return `Score ${score} · ${percent===null?'match —':percent.toFixed(1)+'% match'}`;
 }
+// GCC MIPS marks each function with .ent/.end; keep its own labels and instructions.
+export function functionAssembly(assembly,name){
+ const lines=assembly.split('\n');
+ const start=lines.findIndex(line=>{const m=/^\s*\.ent\s+([A-Za-z_]\w*)(?:\s|,|$)/.exec(line);return m?.[1]===name;});
+ if(start<0)throw Error(`No assembly boundary found for ${name}.`);
+ const end=lines.findIndex((line,i)=>{if(i<=start)return false;const m=/^\s*\.end\s+([A-Za-z_]\w*)(?:\s|,|$)/.exec(line);return m?.[1]===name;});
+ if(end<0)throw Error(`Incomplete assembly boundary for ${name}.`);
+ return lines.slice(start,end+1).join('\n');
+}

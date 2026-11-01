@@ -16,3 +16,10 @@ test('function metrics preserve zero, distinguish untested, and use desktop scor
  assert.equal(functionMetrics({best_score:5000,n_insns:10}),'Score 5000 · 0.0% match');
  assert.equal(functionMetrics({best_score:50,n_insns:0}),'Score 50 · match —');
 });
+
+import {functionAssembly} from '../src/formats.js';
+test('assembly view keeps only the selected function including internal labels',()=>{
+ const asm='.data\nvalue: .word 1\n.ent helper\nhelper:\njr $31\n.end helper\n.ent candidate\ncandidate:\n$L2:\njr $31\n.end candidate\n.ent later\nlater:\n.end later';
+ assert.equal(functionAssembly(asm,'candidate'),'.ent candidate\ncandidate:\n$L2:\njr $31\n.end candidate');
+ assert.throws(()=>functionAssembly(asm,'missing'),/boundary/);
+});
