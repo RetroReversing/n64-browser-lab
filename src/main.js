@@ -34,7 +34,7 @@ startWorker();controls();status('Ready. Tools and ROM processing run locally in 
 window.lab={compile:request=>new Promise((resolve,reject)=>{const w=new Worker(new URL('./compiler.worker.js',import.meta.url),{type:'module'});const timer=setTimeout(()=>{w.terminate();reject(Error('Compiler timed out'));},60000);w.onmessage=({data})=>{if(data.type==='log')return;clearTimeout(timer);w.terminate();data.type==='result'?resolve({...data,bytes:Array.from(data.bytes)}):reject(Error(data.error));};w.onerror=e=>{clearTimeout(timer);w.terminate();reject(Error(e.message));};w.postMessage({id:1,...request});})};
 
 $('browserOrigin').textContent=location.origin;
-function pairedControls(on){paired=on;if(!on)hideFunctionOptions();$('pairHost').textContent=on?'Disconnect':'Pair';for(const id of ['hostSearch','hostFunctions','hostTask'])$(id).disabled=!on;$('pairCode').disabled=on;$('hostUrl').disabled=on;}
+function pairedControls(on){paired=on;if(!on)hideFunctionOptions();$('pairHost').textContent=on?'Disconnect':'Pair';$('desktopConnection').textContent=on?'Disconnect':'Connect to desktop';for(const id of ['hostSearch','hostFunctions','hostTask'])$(id).disabled=!on;$('pairCode').disabled=on;$('hostUrl').disabled=on;}
 async function bridgeAction(label,fn){if(bridgeBusy)return;bridgeBusy=true;$('bridgeProgress').hidden=false;$('bridgeStatus').textContent=label;controls();try{await fn();}catch(error){$('bridgeStatus').textContent=error.message.includes('fetch')?'Could not reach the bridge. Check that the updated desktop app is running, the origin is authorized, and browser localhost permission is allowed.':error.message;}finally{bridgeBusy=false;$('bridgeProgress').hidden=true;controls();}}
 function showFunctionOptions(){const list=$('hostOptions');list.hidden=false;$('hostSearch').setAttribute('aria-expanded','true');}
 function hideFunctionOptions(){ $('hostOptions').hidden=true;$('hostSearch').setAttribute('aria-expanded','false');$('hostSearch').removeAttribute('aria-activedescendant');}
@@ -43,7 +43,7 @@ $('hostSearch').onfocus=()=>{if(paired)showFunctionOptions();};
 $('hostSearch').onblur=hideFunctionOptions;
 $('hostSearch').onkeydown=e=>{const rows=[...$('hostOptions').querySelectorAll('[role=option]')];let i=rows.findIndex(r=>r.getAttribute('aria-selected')==='true');if(e.key==='Escape'){hideFunctionOptions();return;}if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();showFunctionOptions();i=Math.max(0,Math.min(rows.length-1,i+(e.key==='ArrowDown'?1:-1)));rows.forEach((r,n)=>r.setAttribute('aria-selected',String(n===i)));if(rows[i]){$('hostSearch').setAttribute('aria-activedescendant',rows[i].id);rows[i].scrollIntoView({block:'nearest'});}}else if(e.key==='Enter'&&!$('hostOptions').hidden){e.preventDefault();(rows[i]||rows[0])?.click();}};
 
-$('pairHost').onclick=()=>{if(paired){disconnectHost();return;}return bridgeAction('Pairing with the desktop app…',async()=>{const r=await bridge.pair($('hostUrl').value,$('pairCode').value);$('pairCode').value='';try{localStorage.setItem('n64-bridge',JSON.stringify(bridge.snapshot()));}catch{}activeTask=null;pairedControls(true);$('bridgeStatus').textContent=`Paired with ${r.project} for one hour.`;await loadFunctions();});};
+$('pairHost').onclick=()=>{if(paired){disconnectHost();return;}return bridgeAction('Pairing with the desktop app…',async()=>{const r=await bridge.pair($('hostUrl').value,$('pairCode').value);$('pairCode').value='';try{localStorage.setItem('n64-bridge',JSON.stringify(bridge.snapshot()));}catch{}activeTask=null;pairedControls(true);$('bridgeStatus').textContent=`Paired with ${r.project} for one hour.`;await loadFunctions();$('connectionDialog').close();});};
 let searchTimer;
 function refreshSearch(){if(bridgeBusy){searchTimer=setTimeout(refreshSearch,150);return;}bridgeAction('Searching project functions…',loadFunctions);}
 $('hostSearch').oninput=()=>{hideFunctionOptions();clearTimeout(searchTimer);searchTimer=setTimeout(refreshSearch,250);};
@@ -61,3 +61,10 @@ $('forgetConnection').onclick=()=>{try{localStorage.removeItem('n64-bridge');$('
 })();
 
 $('copyDiagnostics').onclick=async()=>{try{await navigator.clipboard.writeText($('log').textContent);$('copyStatus').textContent='Copied';}catch{$('copyStatus').textContent='Copy failed. Select and copy the diagnostics manually.';}};
+
+$('desktopConnection').onclick=()=>{if(paired)disconnectHost();else $('connectionDialog').showModal();};
+$('openConnectionSettings').onclick=()=>$('connectionDialog').showModal();
+$('closeConnection').onclick=()=>$('connectionDialog').close();
+$('connectionDialog').onclick=e=>{if(e.target===$('connectionDialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}};
+
+new MutationObserver(()=>{const output=$('workspaceBridgeStatus');output.textContent=$('bridgeStatus').textContent;output.hidden=!paired&&!activeTask;}).observe($('bridgeStatus'),{childList:true,characterData:true,subtree:true});

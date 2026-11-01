@@ -12,3 +12,4 @@
 .copy-diagnostics{margin:12px 10px 0 0;padding:5px 9px;font-size:11px}#copyStatus{font-size:11px;color:#676154}
 
 #source{background:transparent;border:0;padding:0;min-height:0;min-width:0}#source .cm-editor{width:100%;max-width:100%}#source .cm-scroller{font-family:ui-monospace,monospace}
+#connectionDialog{padding:0;border:1px solid #c8c3b8;border-radius:6px;max-width:min(760px,calc(100vw - 32px));width:760px;max-height:90vh;background:#faf9f5;color:#242219;box-shadow:0 20px 80px #0004}#connectionDialog::backdrop{background:#17170e66}#connectionDialog .bridge-card{margin:0;border:0}#connectionDialog .section-heading{padding-right:50px}#connectionDialog .quiet{display:none}.dialog-close{position:absolute;right:12px;top:10px;border:0;background:transparent;font-size:24px;padding:0 6px;z-index:1}.sidebar-connection{background:transparent;text-align:left;border:0;font-size:14px;padding:12px 10px}
