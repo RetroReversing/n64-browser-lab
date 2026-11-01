@@ -23,6 +23,6 @@ export function renderInstructionDiff(element,model,expanded=false){const table=
 
 export function changedSourceLines(model){
  const lines=new Map(),severity={operands:1,moved:2,different:3};
- for(const row of model.rows){const line=row.candidate?.source?.line;if(row.kind==='same'||!Number.isInteger(line)||line<1)continue;const entry=lines.get(line)||{line,kind:row.kind,count:0};entry.count++;if(severity[row.kind]>severity[entry.kind])entry.kind=row.kind;lines.set(line,entry);}
+ for(const row of model.rows){const line=row.candidate?.source?.line;if(row.kind==='same'||!Number.isInteger(line)||line<1)continue;const entry=lines.get(line)||{line,kind:row.kind,count:0,instructions:[]};entry.count++;entry.instructions.push({kind:row.kind,target:row.target||null,candidate:row.candidate});if(severity[row.kind]>severity[entry.kind])entry.kind=row.kind;lines.set(line,entry);}
  return [...lines.values()].sort((a,b)=>a.line-b.line);
 }
