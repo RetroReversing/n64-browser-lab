@@ -56,8 +56,22 @@ This is a KMC-compatible open-source compiler build, not a redistributed proprie
 - Explicit preprocessor macros approximate this freestanding setup; this is not a full emulation of every GCC driver flag/spec or environment. Branches dependent on other predefined macros need explicit handling.
 - No persistence yet: closing/reloading clears the ROM, source edits and worker filesystem. Download proposals before closing. Stop terminates the worker.
 - The memory-only host adapter is intentionally limited; it is not Node.js in the browser. The worker's filesystem is not a system filesystem.
-- No connection to your running decompdecomp app is enabled. See [the future room bridge](docs/room-bridge.md). The installed app and existing projects are unchanged.
+- An optional, explicitly paired desktop bridge supports manual KMC ROM tasks and source submission for independent host checking. See [the bridge protocol](docs/room-bridge.md). No automatic room joining or work claims.
 
 ## License
 
 App code: GPL-3.0-or-later. Individual third-party tools retain their upstream licenses; see [THIRD_PARTY.md](THIRD_PARTY.md). No ROMs, SDK headers, extracted functions or user credentials are distributed.
+
+## Pair with the desktop app
+
+Requires the matching **browser-worker bridge** update in decompdecomp. The older app does not expose these routes.
+
+1. In desktop **Settings → Pair a browser worker**, select a local KMC ROM project, set the exact browser origin shown by this page (normally `http://127.0.0.1:4179`), and create a code.
+2. In this page’s **Connect to decompdecomp**, enter the desktop loopback URL (normally `http://127.0.0.1:6464`) and the code. Press **Pair**. Browser localhost permission may be requested.
+3. Load your own matching ROM, choose an open function and press **Fetch task**. The ROM and target-range hashes must match.
+4. Edit the function body, **Compile**, then **Submit compiled candidate**. The desktop app recompiles the saved source snapshot with its own toolchain and unchanged judge.
+5. Fetch a fresh task after submission. Tasks expire after five minutes and do not reserve a function; if another agent claims or changes it, submission is rejected.
+
+The token stays in browser memory and is scoped to one origin/project for one hour. **Revoke project browser access** in desktop Settings immediately invalidates capabilities, including results still compiling. Restarting the desktop app also invalidates them. Disconnect clears the browser’s local token; it does not revoke other browsers.
+
+The initial bridge accepts plain C (no source preprocessor directives, assembly or attributes), self-contained host declarations, and an allowlisted KMC flag set including debug levels. Native imports, other toolchains and unrestricted files/commands are unavailable. The browser can still compile standalone examples without pairing.
