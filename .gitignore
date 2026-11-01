@@ -1,0 +1,12 @@
+node_modules/
+dist/
+public/toolchains/*
+!public/toolchains/.gitkeep
+*.z64
+*.v64
+*.n64
+*.rom
+*.bin
+*.elf
+*.o
+artifacts/
