@@ -77,3 +77,8 @@ export function annotatedFunctionAssembly(assembly,name,request){
  prefix.split('\n').forEach(marker);
  return selected.split('\n').map(line=>{marker(line);return current?.text&&/^\s*[A-Za-z][\w.]*\s+[^:]/.test(line)&&!/^\s*\w+:/.test(line)?`${line}\t# C:${current.line} ${current.text}`:line;}).join('\n');
 }
+export function isExactHostMatch(task,result,rom){
+ if(!task||!result||!rom||result.request?.taskId!==task.id||result.request.functionName!==task.function||rom.sha256!==task.romSha256||result.functionAddress!==task.vram||result.bytes.length!==task.byteCount)return false;
+ const offset=task.romOffset;if(!Number.isInteger(offset)||offset<0||offset+task.byteCount>rom.bytes.length)return false;
+ return compareBytes(result.bytes,rom.bytes,offset).exact;
+}

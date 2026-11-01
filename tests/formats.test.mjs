@@ -31,3 +31,16 @@ test('C annotations use source snapshot and subtract host context lines',()=>{
  assert.match(annotatedFunctionAssembly(assembly,'candidate',request),/addiu.*# C:2 return 7;/);
  assert.doesNotMatch(annotatedFunctionAssembly('.ent candidate\ncandidate:\n jr $31\n.end candidate','candidate',request),/# C:/);
 });
+
+import {isExactHostMatch} from '../src/formats.js';
+test('submit eligibility requires a full match at the pinned host offset',()=>{
+ const task={id:'task',function:'f',romSha256:'rom',romOffset:4,byteCount:8,vram:0x80000400};
+ const rom={sha256:'rom',bytes:new Uint8Array(16)};
+ const result={request:{taskId:'task',functionName:'f'},bytes:new Uint8Array(8),functionAddress:task.vram};
+ assert.equal(isExactHostMatch(task,result,rom),true);
+ assert.equal(isExactHostMatch(task,{...result,bytes:new Uint8Array(4)},rom),false);
+ assert.equal(isExactHostMatch(task,{...result,bytes:new Uint8Array(8).fill(1)},rom),false);
+ assert.equal(isExactHostMatch({...task,id:'other'},result,rom),false);
+ assert.equal(isExactHostMatch(task,result,{...rom,sha256:'other'}),false);
+ assert.equal(isExactHostMatch(task,{...result,functionAddress:0},rom),false);
+});
