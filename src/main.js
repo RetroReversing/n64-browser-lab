@@ -57,3 +57,5 @@ $('forgetConnection').onclick=()=>{try{localStorage.removeItem('n64-bridge');$('
  let saved;try{saved=JSON.parse(localStorage.getItem('n64-bridge')||'null');}catch{}
  if(saved){$('hostUrl').value=saved.base;await bridgeAction('Reconnecting to the desktop app…',async()=>{try{await bridge.restore(saved);pairedControls(true);await loadFunctions();}catch(e){bridge.disconnect();pairedControls(false);$('bridgeStatus').textContent=`Could not restore the saved connection: ${e.message} Create a new pairing code if the session has expired or the desktop app restarted.`;}});}
 })();
+
+$('copyDiagnostics').onclick=async()=>{try{await navigator.clipboard.writeText($('log').textContent);$('copyStatus').textContent='Copied';}catch{$('copyStatus').textContent='Copy failed. Select and copy the diagnostics manually.';}};

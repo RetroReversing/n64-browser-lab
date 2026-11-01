@@ -29,3 +29,13 @@ export function compareBytes(candidate,rom,offset){
 }
 export function findBytes(candidate,rom,limit=100){if(!candidate.length)throw Error('Compile a function first.');const result=[];for(let i=0;i<=rom.length-candidate.length;i+=4){let j=0;while(j<candidate.length&&rom[i+j]===candidate[j])j++;if(j===candidate.length){result.push(i);if(result.length===limit)break;}}return result;}
 export async function digest(bytes){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>hex(b,2)).join('').toLowerCase();}
+// Only undefined symbols may inherit automatic address names; never override a C definition.
+export function automaticSymbols(input,known={}){
+ const bytes=new Uint8Array(input),d=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength),result={...known};
+ if(bytes.length<52||d.getUint32(0)!==0x7f454c46||bytes[4]!==1||bytes[5]!==2||d.getUint16(18)!==8)throw Error('Expected a big-endian ELF32 MIPS object.');
+ const start=d.getUint32(32),stride=d.getUint16(46),count=d.getUint16(48);
+ const section=i=>{const p=start+i*stride;if(i>=count||p+40>bytes.length)throw Error('Invalid ELF section.');return {type:d.getUint32(p+4),offset:d.getUint32(p+16),size:d.getUint32(p+20),link:d.getUint32(p+24),entry:d.getUint32(p+36)};};
+ for(let i=0;i<count;i++){const sym=section(i);if(sym.type!==2)continue;const str=section(sym.link);if(sym.entry!==16||sym.size%16||sym.offset+sym.size>bytes.length||str.offset+str.size>bytes.length)throw Error('Invalid ELF symbols.');
+ for(let p=sym.offset;p<sym.offset+sym.size;p+=16){if(d.getUint16(p+14)!==0)continue;const n=d.getUint32(p);if(n>=str.size)continue;const a=str.offset+n,b=bytes.indexOf(0,a);if(b<a||b>=str.offset+str.size)continue;const name=decoder.decode(bytes.subarray(a,b));if(Object.hasOwn(result,name))continue;const m=/^(?:func|D|B|jtbl|L|RO|STR|FLT|DBL|bss|data|sub|gUnknown|unk|off|dword|word|byte|loc)_([0-9A-Fa-f]{1,8})(?:_overlay_[0-9]{3})?$/.exec(name);if(m)result[name]=parseInt(m[1],16);}}
+ return result;
+}

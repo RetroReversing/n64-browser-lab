@@ -1,4 +1,4 @@
-import {elfFunction,digest} from './formats.js';
+import {elfFunction,digest,automaticSymbols} from './formats.js';
 import {createHost} from './host.js';
 const host=createHost(text=>postMessage({type:'log',text}));
 globalThis.__n64Process=host.process;
@@ -22,12 +22,15 @@ onmessage=async({data})=>{try{
  const ccFlags=flags||[optimization,smallData,'-mips3','-mgp32','-mfp32'];
  const asmG=ccFlags.find(f=>/^-G[08]$/.test(f))||'-G0';
  if(!['-O0','-O1','-O2','-O3'].includes(optimization)||!['-G0','-G8'].includes(smallData)||!Number.isInteger(address)||address<0||address>0xffffffff||address%4)throw Error('Invalid compiler options or aligned VRAM address.');
- const definitions=Object.entries(symbols).map(([name,value])=>{if(!/^[A-Za-z_]\w*$/.test(name)||!Number.isInteger(value)||value<0||value>0xffffffff)throw Error('Invalid external symbol.');return `${name} = 0x${value.toString(16)};`;});
+
  host.fs.writeFileSync('/work/input.c',context+'\n'+source);
  await run('cpp',['-undef','-D__mips__','-D__MIPSEB__','-D_LANGUAGE_C','/work/input.c','/work/input.i']);
  await run('cc1',['/work/input.i','-quiet',...ccFlags,'-o','/work/input.s']);
  const assembly=host.fs.readFileSync('/work/input.s','utf8');
  await run('as',['-EB','-mips3',asmG,'-o','/work/input.o','/work/input.s']);
+ const resolvedSymbols=automaticSymbols(host.fs.readFileSync('/work/input.o'),symbols);
+ for(const [name,value] of Object.entries(resolvedSymbols))if(!Object.hasOwn(symbols,name))postMessage({type:'log',text:`Resolved automatic symbol ${name} → 0x${value.toString(16)}\n`});
+ const definitions=Object.entries(resolvedSymbols).map(([name,value])=>{if(!/^[A-Za-z_]\w*$/.test(name)||!Number.isInteger(value)||value<0||value>0xffffffff)throw Error('Invalid external symbol.');return `${name} = 0x${value.toString(16)};`;});
  host.fs.writeFileSync('/work/link.ld',`${definitions.join("\n")}\nSECTIONS { . = 0x${Number(address).toString(16)}; .text : { *(.text*) } .rodata : { *(.rodata*) } .data : { *(.data*) } .bss : { *(.bss*) *(COMMON) } /DISCARD/ : { *(.reginfo) *(.MIPS.abiflags) *(.comment) *(.pdr) *(.gnu.attributes) } }`);
  await run('ld',['-EB','-T','/work/link.ld','-o','/work/output.elf','/work/input.o']);
  await run('objcopy',['-O','binary','--only-section=.text','/work/output.elf','/work/output.bin']);
@@ -35,5 +38,5 @@ onmessage=async({data})=>{try{
  const fn=elfFunction(host.fs.readFileSync('/work/output.elf'),functionName);
  const bytes=fn.bytes;
  const elf=new Uint8Array(host.fs.readFileSync('/work/output.elf'));
- postMessage({type:'result',id,assembly,bytes,elf,textBytes,functionAddress:fn.address,toolchain:toolManifest,request:{source,context,flags,taskId,address,optimization,smallData,functionName,symbols}},[bytes.buffer,elf.buffer]);
+ postMessage({type:'result',id,assembly,bytes,elf,textBytes,functionAddress:fn.address,toolchain:toolManifest,request:{source,context,flags,taskId,address,optimization,smallData,functionName,symbols:resolvedSymbols}},[bytes.buffer,elf.buffer]);
  }catch(e){postMessage({type:'error',id:data.id,error:e.stack||String(e)});}};
