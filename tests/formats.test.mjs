@@ -7,3 +7,12 @@ test('bad files fail with actionable errors',()=>{assert.throws(()=>normalizeRom
 test('matching requires every byte and a valid range',()=>{assert.equal(compareBytes(new Uint8Array([1,2]),new Uint8Array([0,1,2]),1).exact,true);assert.equal(compareBytes(new Uint8Array([1,3]),new Uint8Array([1,2]),0).exact,false);for(const offset of [-1,1.5,2])assert.throws(()=>compareBytes(new Uint8Array([1]),new Uint8Array([1]),offset));});
 test('search is instruction aligned, bounded and rejects empty candidates',()=>{assert.deepEqual(findBytes(new Uint8Array([1]),new Uint8Array([1,1,0,0,1,0,0,0,1]),2),[0,4]);assert.throws(()=>findBytes(new Uint8Array(),new Uint8Array()));});
 test('function extraction rejects non-MIPS/non-ELF input',()=>{assert.throws(()=>elfFunction(new Uint8Array(64),'candidate'),/ELF32 MIPS/);});
+
+import {functionMetrics} from '../src/formats.js';
+test('function metrics preserve zero, distinguish untested, and use desktop score formula',()=>{
+ assert.equal(functionMetrics({best_score:0,n_insns:10}),'Score 0 · 100.0% match');
+ assert.equal(functionMetrics({best_score:50,n_insns:10}),'Score 50 · 95.0% match');
+ assert.match(functionMetrics({best_score:null,n_insns:10}),/Not checked/);
+ assert.equal(functionMetrics({best_score:5000,n_insns:10}),'Score 5000 · 0.0% match');
+ assert.equal(functionMetrics({best_score:50,n_insns:0}),'Score 50 · match —');
+});

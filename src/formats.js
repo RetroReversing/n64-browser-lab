@@ -39,3 +39,10 @@ export function automaticSymbols(input,known={}){
  for(let p=sym.offset;p<sym.offset+sym.size;p+=16){if(d.getUint16(p+14)!==0)continue;const n=d.getUint32(p);if(n>=str.size)continue;const a=str.offset+n,b=bytes.indexOf(0,a);if(b<a||b>=str.offset+str.size)continue;const name=decoder.decode(bytes.subarray(a,b));if(Object.hasOwn(result,name))continue;const m=/^(?:func|D|B|jtbl|L|RO|STR|FLT|DBL|bss|data|sub|gUnknown|unk|off|dword|word|byte|loc)_([0-9A-Fa-f]{1,8})(?:_overlay_[0-9]{3})?$/.exec(name);if(m)result[name]=parseInt(m[1],16);}}
  return result;
 }
+// Same instruction-weighted match percentage used by the desktop ROM workflow.
+export function functionMetrics(fn){
+ if(fn.best_score==null)return 'Not checked · score — · match —';
+ const score=fn.best_score;
+ const percent=fn.n_insns>0?Math.max(0,Math.min(100,100*(1-score/(fn.n_insns*100)))):null;
+ return `Score ${score} · ${percent===null?'match —':percent.toFixed(1)+'% match'}`;
+}
