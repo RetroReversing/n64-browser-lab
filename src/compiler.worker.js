@@ -22,14 +22,14 @@ onmessage=async({data})=>{try{
  const ccFlags=flags||[optimization,smallData,'-mips3','-mgp32','-mfp32'];
  const asmG=ccFlags.find(f=>/^-G[08]$/.test(f))||'-G0';
  if(!['-O0','-O1','-O2','-O3'].includes(optimization)||!['-G0','-G8'].includes(smallData)||!Number.isInteger(address)||address<0||address>0xffffffff||address%4)throw Error('Invalid compiler options or aligned VRAM address.');
- const definitions=Object.entries(symbols).map(([name,value])=>{if(!/^[A-Za-z_]\w*$/.test(name)||!Number.isInteger(value)||value<0||value>0xffffffff)throw Error('Invalid external symbol.');return `--defsym=${name}=0x${value.toString(16)}`;});
+ const definitions=Object.entries(symbols).map(([name,value])=>{if(!/^[A-Za-z_]\w*$/.test(name)||!Number.isInteger(value)||value<0||value>0xffffffff)throw Error('Invalid external symbol.');return `${name} = 0x${value.toString(16)};`;});
  host.fs.writeFileSync('/work/input.c',context+'\n'+source);
  await run('cpp',['-undef','-D__mips__','-D__MIPSEB__','-D_LANGUAGE_C','/work/input.c','/work/input.i']);
  await run('cc1',['/work/input.i','-quiet',...ccFlags,'-o','/work/input.s']);
  const assembly=host.fs.readFileSync('/work/input.s','utf8');
  await run('as',['-EB','-mips3',asmG,'-o','/work/input.o','/work/input.s']);
- host.fs.writeFileSync('/work/link.ld',`SECTIONS { . = 0x${Number(address).toString(16)}; .text : { *(.text*) } .rodata : { *(.rodata*) } .data : { *(.data*) } .bss : { *(.bss*) *(COMMON) } /DISCARD/ : { *(.reginfo) *(.MIPS.abiflags) *(.comment) *(.pdr) *(.gnu.attributes) } }`);
- await run('ld',['-EB','-T','/work/link.ld','-o','/work/output.elf',...definitions,'/work/input.o']);
+ host.fs.writeFileSync('/work/link.ld',`${definitions.join("\n")}\nSECTIONS { . = 0x${Number(address).toString(16)}; .text : { *(.text*) } .rodata : { *(.rodata*) } .data : { *(.data*) } .bss : { *(.bss*) *(COMMON) } /DISCARD/ : { *(.reginfo) *(.MIPS.abiflags) *(.comment) *(.pdr) *(.gnu.attributes) } }`);
+ await run('ld',['-EB','-T','/work/link.ld','-o','/work/output.elf','/work/input.o']);
  await run('objcopy',['-O','binary','--only-section=.text','/work/output.elf','/work/output.bin']);
  const textBytes=new Uint8Array(host.fs.readFileSync('/work/output.bin'));
  const fn=elfFunction(host.fs.readFileSync('/work/output.elf'),functionName);

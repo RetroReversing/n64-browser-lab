@@ -20,9 +20,12 @@ const scratch=await mkdtemp(join(tmpdir(),'n64-browser-test-'));try{
  await page.selectOption('#preset','add');await page.click('#compile');await page.waitForFunction(()=>!document.querySelector('#compare').disabled);await page.click('#compare');assert.match(await page.locator('#comparison').textContent(),/Exact byte match · 8 bytes/);
  // Export must bind the source that produced the bytes, not uncompiled edits in the editor.
  await page.fill('#source','int candidate(void){return 12345;}');const downloadPromise=page.waitForEvent('download');await page.click('#proposal');const download=await downloadPromise;const location=join(scratch,'proposal.json');await download.saveAs(location);const proposal=JSON.parse(await readFile(location,'utf8'));assert.match(proposal.source,/a \+ b/);assert.equal(proposal.hostRecheckRequired,true);assert.equal(proposal.localExact,true);
+ const many=Object.fromEntries(Array.from({length:2500},(_,i)=>['symbol_'+i,0x80001000+i*4]));
+ const large=await page.evaluate(symbols=>lab.compile({source:'int candidate(int a,int b){return a+b;}',symbols}),many);assert.deepEqual(large.bytes,r.bytes);
  const ext=await page.evaluate(()=>lab.compile({source:'extern int helper(int); int candidate(int x){return helper(x)+1;}',functionName:'candidate',symbols:{helper:0x80001000}}));assert(ext.bytes.some((_,i)=>i%4===0&&ext.bytes[i]===0x0c&&ext.bytes[i+2]===0x04));
  await assert.rejects(page.evaluate(()=>lab.compile({source:'int candidate(void){ return broken syntax; }',functionName:'candidate'})),/cc1 exited/);
  await assert.rejects(page.evaluate(()=>lab.compile({source:'extern int missing(void); int candidate(void){return missing();}',functionName:'candidate'})),/ld exited/);
+ await page.reload();await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('Saved ROM restored'));assert.match(await page.locator('#romTitle').textContent(),/HOMEMADE/);
  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
  assert.deepEqual(errors,[]);assert(requests.every(r=>r.method==='GET'));assert(requests.every(r=>new URL(r.url).hostname==='127.0.0.1'));
  console.log('Browser PASS: WASM compile/assemble/link, exact bytes, local ROM, bound export, external relocation, syntax/link errors, mobile, no uploads.');

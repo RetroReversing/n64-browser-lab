@@ -2,7 +2,7 @@
 
 A standalone proof of concept for loading a local N64 ROM and running **KMC-compatible GCC 2.7.2 → GNU assembler 2.6 → GNU linker 2.46 → byte comparison entirely in the browser**.
 
-The compiler runs in a Web Worker. No compilation service, native subprocess, local decompdecomp installation, API key or AI calls are required. The development server only serves static assets. The ROM is read through the browser file picker and stays in tab memory.
+The compiler runs in a Web Worker. No compilation service, native subprocess, local decompdecomp installation, API key or AI calls are required. The development server only serves static assets. The ROM is read through the browser file picker and is saved locally in IndexedDB (never uploaded).
 
 ## Run
 
@@ -54,7 +54,7 @@ This is a KMC-compatible open-source compiler build, not a redistributed proprie
 - No standard headers or implicit runtime libraries. Supply declarations in the editor and explicit linker symbols when needed. Undefined references are errors.
 - Bytes are extracted for one defined ELF function. This is not a rodata/data/relocation-aware whole-function semantic judge; string tables, jump tables and surrounding dependencies need a fuller task format and host recheck.
 - Explicit preprocessor macros approximate this freestanding setup; this is not a full emulation of every GCC driver flag/spec or environment. Branches dependent on other predefined macros need explicit handling.
-- No persistence yet: closing/reloading clears the ROM, source edits and worker filesystem. Download proposals before closing. Stop terminates the worker.
+- ROMs persist locally in IndexedDB; use **Forget saved ROM** to remove them. Source edits and the worker filesystem are still temporary: download proposals before closing. Stop terminates the worker.
 - The memory-only host adapter is intentionally limited; it is not Node.js in the browser. The worker's filesystem is not a system filesystem.
 - An optional, explicitly paired desktop bridge supports manual KMC ROM tasks and source submission for independent host checking. See [the bridge protocol](docs/room-bridge.md). No automatic room joining or work claims.
 
@@ -72,6 +72,8 @@ Requires the matching **browser-worker bridge** update in decompdecomp. The olde
 4. Edit the function body, **Compile**, then **Submit compiled candidate**. The desktop app recompiles the saved source snapshot with its own toolchain and unchanged judge.
 5. Fetch a fresh task after submission. Tasks expire after five minutes and do not reserve a function; if another agent claims or changes it, submission is rejected.
 
-The token stays in browser memory and is scoped to one origin/project for one hour. **Revoke project browser access** in desktop Settings immediately invalidates capabilities, including results still compiling. Restarting the desktop app also invalidates them. Disconnect clears the browser’s local token; it does not revoke other browsers.
+The token is saved in localStorage to reconnect after a browser restart and is scoped to one origin/project for one hour. **Revoke project browser access** in desktop Settings immediately invalidates capabilities, including results still compiling. Restarting the desktop app also invalidates them. Disconnect & forget clears the browser’s saved token; it does not revoke other browsers.
 
 The initial bridge accepts plain C (no source preprocessor directives, assembly or attributes), self-contained host declarations, and an allowlisted KMC flag set including debug levels. Native imports, other toolchains and unrestricted files/commands are unavailable. The browser can still compile standalone examples without pairing.
+
+Linker symbol addresses are passed through the generated linker script, avoiding oversized WASM command-line argument stacks for full project symbol tables.

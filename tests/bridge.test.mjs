@@ -14,3 +14,13 @@ test('pairing explains empty and non-JSON responses and preserves JSON host erro
   const b=createBridge();await assert.rejects(b.pair('http://127.0.0.1:6464','CODE'),message);await assert.rejects(b.list(''),/Pair/);
  }}finally{globalThis.fetch=previous;}
 });
+
+test('saved capability restores scope and expired capabilities clear authentication',async()=>{
+ const previous=globalThis.fetch;
+ try{const b=createBridge();globalThis.fetch=async()=>new Response(JSON.stringify({functions:[],project:'demo'}));
+ await b.restore({base:'http://127.0.0.1:6464',token:'saved-token',project:'demo'});assert.equal(b.snapshot().project,'demo');
+ globalThis.fetch=async()=>new Response(JSON.stringify({error:'Expired capability'}),{status:403});
+ await assert.rejects(b.restore(b.snapshot()),/Expired/);await assert.rejects(b.list(''),/Pair/);
+ await assert.rejects(b.restore({base:'https://remote.example',token:'saved-token'}),/Invalid saved/);
+ }finally{globalThis.fetch=previous;}
+});
