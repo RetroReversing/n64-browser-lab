@@ -24,3 +24,9 @@ test('saved capability restores scope and expired capabilities clear authenticat
  await assert.rejects(b.restore({base:'https://remote.example',token:'saved-token'}),/Invalid saved/);
  }finally{globalThis.fetch=previous;}
 });
+
+test('submission sends the selected host variation ID for independent verification',async()=>{
+ const previous=globalThis.fetch,calls=[];
+ globalThis.fetch=async(url,options)=>{calls.push({url,body:JSON.parse(options.body)});return new Response(JSON.stringify(url.endsWith('/pair')?{token:'cap',project:'demo'}:url.endsWith('/submit')?{job:'job'}:{state:'done',result:{matched:true}}));};
+ try{const b=createBridge();await b.pair('http://127.0.0.1:6464','code');await b.submit('task','int f(void){return 0;}',undefined,'host-variant');assert.equal(calls.find(c=>c.url.endsWith('/submit')).body.variantId,'host-variant');}finally{globalThis.fetch=previous;}
+});
