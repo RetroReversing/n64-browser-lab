@@ -25,7 +25,7 @@ onmessage=async({data})=>{try{
   postMessage({type:'diff',id:data.id,target,candidate});return;
  }
 
- const {id,source,address=0x80000400,optimization='-O2',smallData='-G0',functionName='candidate',symbols={},context='',flags=null,taskId=null}=data;
+ const {id,source,address=0x80000400,optimization='-O2',smallData='-G0',functionName='candidate',symbols={},context='',flags=null,taskId=null,variantId=null}=data;
  const accepted=new Set(['-G0','-G8','-mips3','-mgp32','-mfp32','-O0','-O1','-O2','-O3','-g','-g0','-g1','-g2','-g3']);
  if(flags!==null&&(!Array.isArray(flags)||flags.some(f=>!accepted.has(f))))throw Error('Unsupported host compiler flags.');
  const ccFlags=flags||[optimization,smallData,'-mips3','-mgp32','-mfp32'];
@@ -47,5 +47,5 @@ onmessage=async({data})=>{try{
  const fn=elfFunction(host.fs.readFileSync('/work/output.elf'),functionName);
  const bytes=fn.bytes;
  const elf=new Uint8Array(host.fs.readFileSync('/work/output.elf'));
- postMessage({type:'result',id,assembly,bytes,elf,textBytes,functionAddress:fn.address,toolchain:toolManifest,request:{source,context,flags,taskId,address,optimization,smallData,functionName,symbols:resolvedSymbols}},[bytes.buffer,elf.buffer]);
+ postMessage({type:'result',id,assembly,bytes,elf,textBytes,functionAddress:fn.address,toolchain:toolManifest,request:{source,context,flags,taskId,variantId,address,optimization,smallData,functionName,symbols:resolvedSymbols}},[bytes.buffer,elf.buffer]);
  }catch(e){rawCapture=null;postMessage({type:'error',id:data.id,error:e.stack||String(e)});}};

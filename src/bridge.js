@@ -16,7 +16,7 @@ export function createBridge(){
   async restore(saved){const u=new URL(saved.base);if(u.protocol!=='http:'||!['127.0.0.1','localhost','[::1]'].includes(u.hostname)||u.origin!==saved.base||typeof saved.token!=='string'||!saved.token)throw Error('Invalid saved connection.');base=u.origin;token=saved.token;project=saved.project;try{return await request('functions',{search:''});}catch(e){token='';project='';throw e;}},
   list:search=>request('functions',{search}),
   task:functionId=>request('task',{functionId}),
-  async submit(taskId,source,onProgress){const {job}=await request('submit',{taskId,source});for(let i=0;i<240;i++){const r=await request('result',{job});if(r.state==='done')return r.result;if(r.state==='error'||r.state==='cancelled')throw Error(r.error||'Host verification failed. Fetch a new task.');onProgress?.('Desktop compiler is checking the candidate…');await new Promise(r=>setTimeout(r,500));}throw Error('Host verification is still running. Check the desktop app before fetching another task.');},
+  async submit(taskId,source,onProgress,variantId=null){const {job}=await request('submit',{taskId,source,...(variantId?{variantId}:{})});for(let i=0;i<240;i++){const r=await request('result',{job});if(r.state==='done')return r.result;if(r.state==='error'||r.state==='cancelled')throw Error(r.error||'Host verification failed. Fetch a new task.');onProgress?.('Desktop compiler is checking the candidate…');await new Promise(r=>setTimeout(r,500));}throw Error('Host verification is still running. Check the desktop app before fetching another task.');},
   disconnect(){token='';project='';base='';},
   get project(){return project;}
  };
