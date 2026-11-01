@@ -20,3 +20,9 @@ export function renderInstructionDiff(element,model,expanded=false){const table=
  for(let i=0;i<model.rows.length;){let end=i;while(end<model.rows.length&&model.rows[end].kind==='same')end++;if(!expanded&&end-i>8){model.rows.slice(i,i+3).forEach(render);const tr=document.createElement('tr'),td=document.createElement('td'),button=document.createElement('button');td.colSpan=2;td.className='diff-fold';button.textContent=`⋯ ${end-i-6} identical instructions ⋯`;button.onclick=()=>element.dispatchEvent(new Event('expanddiff'));td.append(button);tr.append(td);body.append(tr);model.rows.slice(end-3,end).forEach(render);i=end;}else{render(model.rows[i]);i++;}}
  table.append(body);element.replaceChildren(table);
 }
+
+export function changedSourceLines(model){
+ const lines=new Map(),severity={operands:1,moved:2,different:3};
+ for(const row of model.rows){const line=row.candidate?.source?.line;if(row.kind==='same'||!Number.isInteger(line)||line<1)continue;const entry=lines.get(line)||{line,kind:row.kind,count:0};entry.count++;if(severity[row.kind]>severity[entry.kind])entry.kind=row.kind;lines.set(line,entry);}
+ return [...lines.values()].sort((a,b)=>a.line-b.line);
+}

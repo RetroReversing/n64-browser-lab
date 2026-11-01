@@ -16,3 +16,9 @@ test('aligns inserted instructions and distinguishes operands and different opco
 test('does not treat identical text with different encoding as identical',()=>{
  assert.notEqual(instructionDiff([ins('01')],[ins('02')]).rows[0].kind,'same');
 });
+
+import {changedSourceLines} from '../src/diff.js';
+test('maps differing candidate instructions to C lines without guessing target-only deletions',()=>{
+ const row=(kind,line)=>({kind,candidate:{source:{line}}});
+ assert.deepEqual(changedSourceLines({rows:[row('same',1),row('operands',3),row('different',3),row('moved',5),{kind:'different',target:{}},{kind:'different',candidate:{}}]}),[{line:3,kind:'different',count:2},{line:5,kind:'moved',count:1}]);
+});
