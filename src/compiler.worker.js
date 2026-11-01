@@ -1,11 +1,13 @@
-import {elfFunction} from './formats.js';
+import {elfFunction,digest} from './formats.js';
 import {createHost} from './host.js';
 const host=createHost(text=>postMessage({type:'log',text}));
 globalThis.__n64Process=host.process;
 const wasmCache=new Map();
+let toolManifest;
 async function run(tool,args){
  postMessage({type:'log',text:`\n$ ${tool} ${args.join(' ')}\n`});
- if(!wasmCache.has(tool)){const r=await fetch(`/toolchains/${tool}.wasm`);if(!r.ok)throw Error(`Missing ${tool} WASM. Run npm run stage.`);wasmCache.set(tool,new Uint8Array(await r.arrayBuffer()));}
+ if(!toolManifest){const response=await fetch('/toolchains/manifest.json');if(!response.ok)throw Error('Missing toolchain manifest. Run npm run stage.');toolManifest=await response.json();}
+ if(!wasmCache.has(tool)){const r=await fetch(`/toolchains/${tool}.wasm`);if(!r.ok)throw Error(`Missing ${tool} WASM. Run npm run stage.`);const bytes=new Uint8Array(await r.arrayBuffer());if(await digest(bytes)!==toolManifest[tool]?.sha256)throw Error(`Toolchain integrity check failed for ${tool}.`);wasmCache.set(tool,bytes);}
  const {default:factory}=await import(/* @vite-ignore */ `/toolchains/${tool}.mjs`);
  let exit=0;
  const mod=await factory({wasmBinary:wasmCache.get(tool),noInitialRun:true,print:t=>postMessage({type:'log',text:t+'\n'}),printErr:t=>postMessage({type:'log',text:t+'\n'}),quit:code=>{exit=code;}});
@@ -29,5 +31,5 @@ onmessage=async({data})=>{try{
  const fn=elfFunction(host.fs.readFileSync('/work/output.elf'),functionName);
  const bytes=fn.bytes;
  const elf=new Uint8Array(host.fs.readFileSync('/work/output.elf'));
- postMessage({type:'result',id,assembly,bytes,elf,textBytes,functionAddress:fn.address,request:{source,address,optimization,smallData,functionName,symbols}},[bytes.buffer,elf.buffer]);
+ postMessage({type:'result',id,assembly,bytes,elf,textBytes,functionAddress:fn.address,toolchain:toolManifest,request:{source,address,optimization,smallData,functionName,symbols}},[bytes.buffer,elf.buffer]);
  }catch(e){postMessage({type:'error',id:data.id,error:e.stack||String(e)});}};
