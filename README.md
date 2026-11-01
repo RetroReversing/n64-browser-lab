@@ -72,7 +72,7 @@ Requires the matching **browser-worker bridge** update in decompdecomp. The olde
 4. Edit the function body, **Compile**, then **Submit compiled candidate**. The desktop app recompiles the saved source snapshot with its own toolchain and unchanged judge.
 5. Fetch a fresh task after submission. Tasks expire after five minutes and do not reserve a function; if another agent claims or changes it, submission is rejected.
 
-The token is saved in localStorage to reconnect after a browser restart and is scoped to one origin/project for one hour. **Revoke project browser access** in desktop Settings immediately invalidates capabilities, including results still compiling. Restarting the desktop app also invalidates them. Disconnect & forget clears the browser’s saved token; it does not revoke other browsers.
+The token is saved in localStorage to reconnect after a browser restart and is scoped to one origin/project for one hour. **Revoke project browser access** in desktop Settings immediately invalidates capabilities, including results still compiling. Restarting the desktop app also invalidates them. Disconnect ends the current tab’s connection. Forget saved connection removes the saved token without ending the active connection; neither action revokes other browsers.
 
 The initial bridge accepts plain C (no source preprocessor directives, assembly or attributes), self-contained host declarations, and an allowlisted KMC flag set including debug levels. Native imports, other toolchains and unrestricted files/commands are unavailable. The browser can still compile standalone examples without pairing.
 
