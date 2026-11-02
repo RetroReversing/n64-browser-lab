@@ -1,0 +1,1119 @@
+{
+  "schemaVersion": 1,
+  "architecture": "N64 CPU: VR4300 / MIPS III",
+  "notes": [
+    "Brief descriptions cover CPU instructions and common GNU assembler aliases, not the separate RSP vector instruction set.",
+    "Aliases/macros can expand to multiple machine instructions. Branch delay-slot behavior follows pre-Release-6 MIPS.",
+    "Unknown mnemonics deliberately get no guessed explanation."
+  ],
+  "sources": [
+    {
+      "title": "NEC VR4300/VR4305/VR4310 User Manual (U10504EJ7V0UMJ1)",
+      "url": "https://n64dev.org/p/U10504EJ7V0UMJ1.pdf"
+    },
+    {
+      "title": "GNU binutils objdump: MIPS disassembler aliases",
+      "url": "https://sourceware.org/binutils/docs/binutils/objdump.html"
+    }
+  ],
+  "instructions": {
+    ".word": {
+      "description": "Raw 32-bit data or an instruction the disassembler could not decode; not an instruction mnemonic.",
+      "category": "data"
+    },
+    "abs": {
+      "description": "Compute an integer absolute value; an assembler macro that may need several instructions.",
+      "category": "alias"
+    },
+    "abs.d": {
+      "description": "Take the absolute value of a double-precision floating-point value.",
+      "category": "floating-point"
+    },
+    "abs.s": {
+      "description": "Take the absolute value of a single-precision floating-point value.",
+      "category": "floating-point"
+    },
+    "add": {
+      "description": "Add two 32-bit integers; signed overflow raises an exception.",
+      "category": "integer"
+    },
+    "add.d": {
+      "description": "Add two double-precision floating-point values.",
+      "category": "floating-point"
+    },
+    "add.s": {
+      "description": "Add two single-precision floating-point values.",
+      "category": "floating-point"
+    },
+    "addi": {
+      "description": "Add a sign-extended immediate to a 32-bit integer; signed overflow raises an exception.",
+      "category": "integer"
+    },
+    "addiu": {
+      "description": "Add a sign-extended immediate to a 32-bit integer without an overflow exception.",
+      "category": "integer"
+    },
+    "addu": {
+      "description": "Add two 32-bit integers without an overflow exception.",
+      "category": "integer"
+    },
+    "and": {
+      "description": "Compute the bitwise AND of two registers.",
+      "category": "integer"
+    },
+    "andi": {
+      "description": "Compute bitwise AND with a zero-extended 16-bit immediate.",
+      "category": "integer"
+    },
+    "b": {
+      "description": "Unconditionally branch to a nearby label after the delay slot; alias for beq zero, zero.",
+      "category": "alias",
+      "delaySlot": "always"
+    },
+    "bal": {
+      "description": "Branch and save a return address; alias for bgezal zero. The next instruction is a delay slot.",
+      "category": "alias",
+      "delaySlot": "always"
+    },
+    "bc1f": {
+      "description": "Branch if the FPU comparison condition is false; execute the delay slot either way.",
+      "category": "floating-point",
+      "delaySlot": "always"
+    },
+    "bc1fl": {
+      "description": "Branch if the FPU comparison condition is false; execute the delay slot only if taken.",
+      "category": "floating-point",
+      "delaySlot": "taken-only"
+    },
+    "bc1t": {
+      "description": "Branch if the FPU comparison condition is true; execute the delay slot either way.",
+      "category": "floating-point",
+      "delaySlot": "always"
+    },
+    "bc1tl": {
+      "description": "Branch if the FPU comparison condition is true; execute the delay slot only if taken.",
+      "category": "floating-point",
+      "delaySlot": "taken-only"
+    },
+    "beq": {
+      "description": "Branch if the two registers are equal. The next instruction is a delay slot executed either way.",
+      "category": "branch",
+      "delaySlot": "always"
+    },
+    "beql": {
+      "description": "Branch if the two registers are equal. Execute the delay slot only when the branch is taken.",
+      "category": "branch",
+      "delaySlot": "taken-only"
+    },
+    "beqz": {
+      "description": "Branch if the register is zero; alias comparing against zero. The delay slot executes either way.",
+      "category": "alias",
+      "delaySlot": "always"
+    },
+    "beqzl": {
+      "description": "Branch if the register is zero; alias comparing against zero. The delay slot executes only if taken.",
+      "category": "alias",
+      "delaySlot": "taken-only"
+    },
+    "bge": {
+      "description": "Branch when the first signed operand is greater than or equal to the second; assembler macro.",
+      "category": "alias"
+    },
+    "bgeu": {
+      "description": "Branch when the first unsigned operand is greater than or equal to the second; assembler macro.",
+      "category": "alias"
+    },
+    "bgez": {
+      "description": "Branch if the signed register is zero or positive. The next instruction is a delay slot executed either way.",
+      "category": "branch",
+      "delaySlot": "always"
+    },
+    "bgezal": {
+      "description": "Branch if the signed register is zero or positive and set the return link register. The next instruction is a delay slot.",
+      "category": "branch",
+      "delaySlot": "always"
+    },
+    "bgezall": {
+      "description": "Branch if the signed register is zero or positive and set the return link register. Execute the delay slot only if taken.",
+      "category": "branch",
+      "delaySlot": "taken-only"
+    },
+    "bgezl": {
+      "description": "Branch if the signed register is zero or positive. Execute the delay slot only when the branch is taken.",
+      "category": "branch",
+      "delaySlot": "taken-only"
+    },
+    "bgt": {
+      "description": "Branch when the first signed operand is greater than the second; assembler macro.",
+      "category": "alias"
+    },
+    "bgtu": {
+      "description": "Branch when the first unsigned operand is greater than the second; assembler macro.",
+      "category": "alias"
+    },
+    "bgtz": {
+      "description": "Branch if the signed register is positive. The next instruction is a delay slot executed either way.",
+      "category": "branch",
+      "delaySlot": "always"
+    },
+    "bgtzl": {
+      "description": "Branch if the signed register is positive. Execute the delay slot only when the branch is taken.",
+      "category": "branch",
+      "delaySlot": "taken-only"
+    },
+    "ble": {
+      "description": "Branch when the first signed operand is less than or equal to the second; assembler macro.",
+      "category": "alias"
+    },
+    "bleu": {
+      "description": "Branch when the first unsigned operand is less than or equal to the second; assembler macro.",
+      "category": "alias"
+    },
+    "blez": {
+      "description": "Branch if the signed register is zero or negative. The next instruction is a delay slot executed either way.",
+      "category": "branch",
+      "delaySlot": "always"
+    },
+    "blezl": {
+      "description": "Branch if the signed register is zero or negative. Execute the delay slot only when the branch is taken.",
+      "category": "branch",
+      "delaySlot": "taken-only"
+    },
+    "blt": {
+      "description": "Branch when the first signed operand is less than the second; assembler macro.",
+      "category": "alias"
+    },
+    "bltu": {
+      "description": "Branch when the first unsigned operand is less than the second; assembler macro.",
+      "category": "alias"
+    },
+    "bltz": {
+      "description": "Branch if the signed register is negative. The next instruction is a delay slot executed either way.",
+      "category": "branch",
+      "delaySlot": "always"
+    },
+    "bltzal": {
+      "description": "Branch if the signed register is negative and set the return link register. The next instruction is a delay slot.",
+      "category": "branch",
+      "delaySlot": "always"
+    },
+    "bltzall": {
+      "description": "Branch if the signed register is negative and set the return link register. Execute the delay slot only if taken.",
+      "category": "branch",
+      "delaySlot": "taken-only"
+    },
+    "bltzl": {
+      "description": "Branch if the signed register is negative. Execute the delay slot only when the branch is taken.",
+      "category": "branch",
+      "delaySlot": "taken-only"
+    },
+    "bne": {
+      "description": "Branch if the two registers differ. The next instruction is a delay slot executed either way.",
+      "category": "branch",
+      "delaySlot": "always"
+    },
+    "bnel": {
+      "description": "Branch if the two registers differ. Execute the delay slot only when the branch is taken.",
+      "category": "branch",
+      "delaySlot": "taken-only"
+    },
+    "bnez": {
+      "description": "Branch if the register is nonzero; alias comparing against zero. The delay slot executes either way.",
+      "category": "alias",
+      "delaySlot": "always"
+    },
+    "bnezl": {
+      "description": "Branch if the register is nonzero; alias comparing against zero. The delay slot executes only if taken.",
+      "category": "alias",
+      "delaySlot": "taken-only"
+    },
+    "break": {
+      "description": "Raise a breakpoint exception.",
+      "category": "system"
+    },
+    "c.eq.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when equal.",
+      "category": "floating-point"
+    },
+    "c.eq.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when equal.",
+      "category": "floating-point"
+    },
+    "c.f.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when always false.",
+      "category": "floating-point"
+    },
+    "c.f.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when always false.",
+      "category": "floating-point"
+    },
+    "c.le.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when less than or equal. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.le.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when less than or equal. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.lt.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when less than. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.lt.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when less than. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.nge.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when unordered or less than. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.nge.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when unordered or less than. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.ngl.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when unordered or equal. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.ngl.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when unordered or equal. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.ngle.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when unordered. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.ngle.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when unordered. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.ngt.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when unordered or less than or equal. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.ngt.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when unordered or less than or equal. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.ole.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when ordered and less than or equal.",
+      "category": "floating-point"
+    },
+    "c.ole.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when ordered and less than or equal.",
+      "category": "floating-point"
+    },
+    "c.olt.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when ordered and less than.",
+      "category": "floating-point"
+    },
+    "c.olt.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when ordered and less than.",
+      "category": "floating-point"
+    },
+    "c.seq.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when equal. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.seq.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when equal. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.sf.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when always false. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.sf.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when always false. This signaling comparison raises invalid-operation for NaN operands.",
+      "category": "floating-point"
+    },
+    "c.ueq.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when unordered or equal.",
+      "category": "floating-point"
+    },
+    "c.ueq.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when unordered or equal.",
+      "category": "floating-point"
+    },
+    "c.ule.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when unordered or less than or equal.",
+      "category": "floating-point"
+    },
+    "c.ule.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when unordered or less than or equal.",
+      "category": "floating-point"
+    },
+    "c.ult.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when unordered or less than.",
+      "category": "floating-point"
+    },
+    "c.ult.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when unordered or less than.",
+      "category": "floating-point"
+    },
+    "c.un.d": {
+      "description": "Compare double-precision floats and set the FPU condition flag when unordered (at least one operand is NaN).",
+      "category": "floating-point"
+    },
+    "c.un.s": {
+      "description": "Compare single-precision floats and set the FPU condition flag when unordered (at least one operand is NaN).",
+      "category": "floating-point"
+    },
+    "cache": {
+      "description": "Perform the cache operation selected by the operation field at the specified address.",
+      "category": "system"
+    },
+    "ceil.l.d": {
+      "description": "Round toward positive infinity: convert a double-precision float to a signed 64-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "ceil.l.s": {
+      "description": "Round toward positive infinity: convert a single-precision float to a signed 64-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "ceil.w.d": {
+      "description": "Round toward positive infinity: convert a double-precision float to a signed 32-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "ceil.w.s": {
+      "description": "Round toward positive infinity: convert a single-precision float to a signed 32-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "cfc1": {
+      "description": "Copy an FPU control/status register to a general register.",
+      "category": "floating-point"
+    },
+    "clear": {
+      "description": "Set a register to zero; an assembler alias.",
+      "category": "alias"
+    },
+    "ctc1": {
+      "description": "Copy a general register into an FPU control/status register.",
+      "category": "floating-point"
+    },
+    "cvt.d.l": {
+      "description": "Convert a signed 64-bit integer held in an FPU register to a double-precision float.",
+      "category": "floating-point"
+    },
+    "cvt.d.s": {
+      "description": "Convert a single-precision float to double precision.",
+      "category": "floating-point"
+    },
+    "cvt.d.w": {
+      "description": "Convert a signed 32-bit integer held in an FPU register to a double-precision float.",
+      "category": "floating-point"
+    },
+    "cvt.l.d": {
+      "description": "Convert a double-precision float to a signed 64-bit integer in an FPU register, using the current FPU rounding mode.",
+      "category": "floating-point"
+    },
+    "cvt.l.s": {
+      "description": "Convert a single-precision float to a signed 64-bit integer in an FPU register, using the current FPU rounding mode.",
+      "category": "floating-point"
+    },
+    "cvt.s.d": {
+      "description": "Convert a double-precision float to single precision.",
+      "category": "floating-point"
+    },
+    "cvt.s.l": {
+      "description": "Convert a signed 64-bit integer held in an FPU register to a single-precision float.",
+      "category": "floating-point"
+    },
+    "cvt.s.w": {
+      "description": "Convert a signed 32-bit integer held in an FPU register to a single-precision float.",
+      "category": "floating-point"
+    },
+    "cvt.w.d": {
+      "description": "Convert a double-precision float to a signed 32-bit integer in an FPU register, using the current FPU rounding mode.",
+      "category": "floating-point"
+    },
+    "cvt.w.s": {
+      "description": "Convert a single-precision float to a signed 32-bit integer in an FPU register, using the current FPU rounding mode.",
+      "category": "floating-point"
+    },
+    "dabs": {
+      "description": "Compute an integer absolute value; an assembler macro that may need several instructions.",
+      "category": "alias"
+    },
+    "dadd": {
+      "description": "Add two 64-bit integers; signed overflow raises an exception.",
+      "category": "integer"
+    },
+    "daddi": {
+      "description": "Add a sign-extended immediate to a 64-bit integer; signed overflow raises an exception.",
+      "category": "integer"
+    },
+    "daddiu": {
+      "description": "Add a sign-extended immediate to a 64-bit integer without an overflow exception.",
+      "category": "integer"
+    },
+    "daddu": {
+      "description": "Add two 64-bit integers without an overflow exception.",
+      "category": "integer"
+    },
+    "ddiv": {
+      "description": "Divide signed 64-bit integers; LO receives the quotient and HI the remainder. Assembler macros may add safety checks.",
+      "category": "integer"
+    },
+    "ddivu": {
+      "description": "Divide unsigned 64-bit integers; LO receives the quotient and HI the remainder. Assembler macros may add safety checks.",
+      "category": "integer"
+    },
+    "div": {
+      "description": "Divide signed 32-bit integers; LO receives the quotient and HI the remainder. Assembler macros may add safety checks.",
+      "category": "integer"
+    },
+    "div.d": {
+      "description": "Divide two double-precision floating-point values.",
+      "category": "floating-point"
+    },
+    "div.s": {
+      "description": "Divide two single-precision floating-point values.",
+      "category": "floating-point"
+    },
+    "divu": {
+      "description": "Divide unsigned 32-bit integers; LO receives the quotient and HI the remainder. Assembler macros may add safety checks.",
+      "category": "integer"
+    },
+    "dla": {
+      "description": "Load a symbol address into a register; this assembler macro may expand into several instructions.",
+      "category": "alias"
+    },
+    "dli": {
+      "description": "Load an integer constant into a register; this assembler macro may expand into several instructions.",
+      "category": "alias"
+    },
+    "dmfc0": {
+      "description": "Copy 64 bits from a CP0 system register to a general register.",
+      "category": "system"
+    },
+    "dmfc1": {
+      "description": "Copy 64 bits from an FPU data register to a general register.",
+      "category": "floating-point"
+    },
+    "dmtc0": {
+      "description": "Copy 64 bits from a general register to a CP0 system register.",
+      "category": "system"
+    },
+    "dmtc1": {
+      "description": "Copy 64 bits from a general register to an FPU data register; this transfers bits without numeric conversion.",
+      "category": "floating-point"
+    },
+    "dmul": {
+      "description": "Multiply values and return the low product in a general register; on MIPS III this is an assembler macro.",
+      "category": "alias"
+    },
+    "dmult": {
+      "description": "Multiply two signed 64-bit integers; place the upper product in HI and lower product in LO.",
+      "category": "integer"
+    },
+    "dmultu": {
+      "description": "Multiply two unsigned 64-bit integers; place the upper product in HI and lower product in LO.",
+      "category": "integer"
+    },
+    "dmulu": {
+      "description": "Multiply values and return the low product in a general register; on MIPS III this is an assembler macro.",
+      "category": "alias"
+    },
+    "dneg": {
+      "description": "Negate a signed integer using subtraction from zero; overflow can raise an exception.",
+      "category": "alias"
+    },
+    "dnegu": {
+      "description": "Negate an integer without an overflow exception.",
+      "category": "alias"
+    },
+    "drem": {
+      "description": "Compute an integer remainder using division; the u forms use unsigned operands. Assembler macro.",
+      "category": "alias"
+    },
+    "dremu": {
+      "description": "Compute an integer remainder using division; the u forms use unsigned operands. Assembler macro.",
+      "category": "alias"
+    },
+    "drol": {
+      "description": "Rotate bits left or right; on MIPS III this is an assembler macro using shifts and logical operations.",
+      "category": "alias"
+    },
+    "dror": {
+      "description": "Rotate bits left or right; on MIPS III this is an assembler macro using shifts and logical operations.",
+      "category": "alias"
+    },
+    "dsll": {
+      "description": "Shift left, filling with zeros; use an immediate shift count on a 64-bit value.",
+      "category": "integer"
+    },
+    "dsll32": {
+      "description": "Shift left, filling with zeros on a 64-bit value by 32 plus the immediate count.",
+      "category": "integer"
+    },
+    "dsllv": {
+      "description": "Shift left, filling with zeros; take the shift count from a register for a 64-bit value.",
+      "category": "integer"
+    },
+    "dsra": {
+      "description": "Shift right, copying the sign bit; use an immediate shift count on a 64-bit value.",
+      "category": "integer"
+    },
+    "dsra32": {
+      "description": "Shift right, copying the sign bit on a 64-bit value by 32 plus the immediate count.",
+      "category": "integer"
+    },
+    "dsrav": {
+      "description": "Shift right, copying the sign bit; take the shift count from a register for a 64-bit value.",
+      "category": "integer"
+    },
+    "dsrl": {
+      "description": "Shift right, filling with zeros; use an immediate shift count on a 64-bit value.",
+      "category": "integer"
+    },
+    "dsrl32": {
+      "description": "Shift right, filling with zeros on a 64-bit value by 32 plus the immediate count.",
+      "category": "integer"
+    },
+    "dsrlv": {
+      "description": "Shift right, filling with zeros; take the shift count from a register for a 64-bit value.",
+      "category": "integer"
+    },
+    "dsub": {
+      "description": "Subtract 64-bit integers; signed overflow raises an exception.",
+      "category": "integer"
+    },
+    "dsubu": {
+      "description": "Subtract 64-bit integers without an overflow exception.",
+      "category": "integer"
+    },
+    "eret": {
+      "description": "Return from an exception using the exception return address; unlike ordinary jumps, has no delay slot.",
+      "category": "system"
+    },
+    "floor.l.d": {
+      "description": "Round toward negative infinity: convert a double-precision float to a signed 64-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "floor.l.s": {
+      "description": "Round toward negative infinity: convert a single-precision float to a signed 64-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "floor.w.d": {
+      "description": "Round toward negative infinity: convert a double-precision float to a signed 32-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "floor.w.s": {
+      "description": "Round toward negative infinity: convert a single-precision float to a signed 32-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "j": {
+      "description": "Jump after the delay slot. Machine J encodes a destination in the current address region; the assembler's register form is an alias for JR.",
+      "category": "branch",
+      "delaySlot": "always"
+    },
+    "jal": {
+      "description": "Call the encoded destination, saving PC + 8 in the return link register; execute the delay slot first.",
+      "category": "branch",
+      "delaySlot": "always"
+    },
+    "jalr": {
+      "description": "Call an address held in a register, saving PC + 8 in the link register; execute the delay slot first.",
+      "category": "branch",
+      "delaySlot": "always"
+    },
+    "jr": {
+      "description": "Jump to the address in a register after the delay slot; jr ra usually returns from a function.",
+      "category": "branch",
+      "delaySlot": "always"
+    },
+    "l.d": {
+      "description": "Load 64 bits from memory into an FPU register. Assembler alias.",
+      "category": "alias"
+    },
+    "l.s": {
+      "description": "Load 32 bits from memory into an FPU register. Assembler alias.",
+      "category": "alias"
+    },
+    "la": {
+      "description": "Load a symbol address into a register; this assembler macro may expand into several instructions.",
+      "category": "alias"
+    },
+    "lb": {
+      "description": "Load one byte and sign-extend it at the base-register-plus-signed-offset memory address.",
+      "category": "memory"
+    },
+    "lbu": {
+      "description": "Load one byte and zero-extend it at the base-register-plus-signed-offset memory address.",
+      "category": "memory"
+    },
+    "ld": {
+      "description": "Load a 64-bit doubleword at the base-register-plus-signed-offset memory address.",
+      "category": "memory"
+    },
+    "ldc1": {
+      "description": "Load 64 bits from memory into an FPU register.",
+      "category": "floating-point"
+    },
+    "ldl": {
+      "description": "Merge bytes from memory into part of a 64-bit register value; paired loads can read an unaligned doubleword.",
+      "category": "memory"
+    },
+    "ldr": {
+      "description": "Merge bytes from memory into part of a 64-bit register value; paired loads can read an unaligned doubleword.",
+      "category": "memory"
+    },
+    "lh": {
+      "description": "Load a 16-bit halfword and sign-extend it at the base-register-plus-signed-offset memory address.",
+      "category": "memory"
+    },
+    "lhu": {
+      "description": "Load a 16-bit halfword and zero-extend it at the base-register-plus-signed-offset memory address.",
+      "category": "memory"
+    },
+    "li": {
+      "description": "Load an integer constant into a register; this assembler macro may expand into several instructions.",
+      "category": "alias"
+    },
+    "ll": {
+      "description": "Load a linked 32-bit word and start a reservation for a later conditional store.",
+      "category": "memory"
+    },
+    "lld": {
+      "description": "Load a linked 64-bit doubleword and start a reservation for a later conditional store.",
+      "category": "memory"
+    },
+    "lui": {
+      "description": "Load an immediate into bits 31\u201316 and clear bits 15\u20130; sign-extend the 32-bit result.",
+      "category": "integer"
+    },
+    "lw": {
+      "description": "Load a 32-bit word and sign-extend it at the base-register-plus-signed-offset memory address.",
+      "category": "memory"
+    },
+    "lwc1": {
+      "description": "Load 32 bits from memory into an FPU register.",
+      "category": "floating-point"
+    },
+    "lwl": {
+      "description": "Merge bytes from memory into part of a 32-bit register value; paired loads can read an unaligned word.",
+      "category": "memory"
+    },
+    "lwr": {
+      "description": "Merge bytes from memory into part of a 32-bit register value; paired loads can read an unaligned word.",
+      "category": "memory"
+    },
+    "lwu": {
+      "description": "Load a 32-bit word and zero-extend it at the base-register-plus-signed-offset memory address.",
+      "category": "memory"
+    },
+    "mfc0": {
+      "description": "Copy 32 bits from a CP0 system register to a general register.",
+      "category": "system"
+    },
+    "mfc1": {
+      "description": "Copy 32 bits from an FPU data register to a general register.",
+      "category": "floating-point"
+    },
+    "mfhi": {
+      "description": "Copy the HI multiply/divide result register to a general register.",
+      "category": "integer"
+    },
+    "mflo": {
+      "description": "Copy the LO multiply/divide result register to a general register.",
+      "category": "integer"
+    },
+    "mov.d": {
+      "description": "Copy a double-precision floating-point value.",
+      "category": "floating-point"
+    },
+    "mov.s": {
+      "description": "Copy a single-precision floating-point value.",
+      "category": "floating-point"
+    },
+    "move": {
+      "description": "Copy one register to another; an alias for a suitable add or OR with the zero register.",
+      "category": "alias"
+    },
+    "mtc0": {
+      "description": "Copy 32 bits from a general register to a CP0 system register.",
+      "category": "system"
+    },
+    "mtc1": {
+      "description": "Copy 32 bits from a general register to an FPU data register; this transfers bits without numeric conversion.",
+      "category": "floating-point"
+    },
+    "mthi": {
+      "description": "Copy a general register into HI.",
+      "category": "integer"
+    },
+    "mtlo": {
+      "description": "Copy a general register into LO.",
+      "category": "integer"
+    },
+    "mul": {
+      "description": "Multiply values and return the low product in a general register; on MIPS III this is an assembler macro.",
+      "category": "alias"
+    },
+    "mul.d": {
+      "description": "Multiply two double-precision floating-point values.",
+      "category": "floating-point"
+    },
+    "mul.s": {
+      "description": "Multiply two single-precision floating-point values.",
+      "category": "floating-point"
+    },
+    "mult": {
+      "description": "Multiply two signed 32-bit integers; place the upper product in HI and lower product in LO.",
+      "category": "integer"
+    },
+    "multu": {
+      "description": "Multiply two unsigned 32-bit integers; place the upper product in HI and lower product in LO.",
+      "category": "integer"
+    },
+    "mulu": {
+      "description": "Multiply values and return the low product in a general register; on MIPS III this is an assembler macro.",
+      "category": "alias"
+    },
+    "neg": {
+      "description": "Negate a signed integer using subtraction from zero; overflow can raise an exception.",
+      "category": "alias"
+    },
+    "neg.d": {
+      "description": "Negate a double-precision floating-point value.",
+      "category": "floating-point"
+    },
+    "neg.s": {
+      "description": "Negate a single-precision floating-point value.",
+      "category": "floating-point"
+    },
+    "negu": {
+      "description": "Negate an integer without an overflow exception.",
+      "category": "alias"
+    },
+    "nop": {
+      "description": "Do nothing. This is the assembler/disassembler alias for sll zero, zero, 0.",
+      "category": "alias"
+    },
+    "nor": {
+      "description": "Compute the bitwise NOR of two registers.",
+      "category": "integer"
+    },
+    "not": {
+      "description": "Invert all bits of a register; an alias for NOR with the zero register.",
+      "category": "alias"
+    },
+    "or": {
+      "description": "Compute the bitwise OR of two registers.",
+      "category": "integer"
+    },
+    "ori": {
+      "description": "Compute bitwise OR with a zero-extended 16-bit immediate.",
+      "category": "integer"
+    },
+    "rem": {
+      "description": "Compute an integer remainder using division; the u forms use unsigned operands. Assembler macro.",
+      "category": "alias"
+    },
+    "remu": {
+      "description": "Compute an integer remainder using division; the u forms use unsigned operands. Assembler macro.",
+      "category": "alias"
+    },
+    "rol": {
+      "description": "Rotate bits left or right; on MIPS III this is an assembler macro using shifts and logical operations.",
+      "category": "alias"
+    },
+    "ror": {
+      "description": "Rotate bits left or right; on MIPS III this is an assembler macro using shifts and logical operations.",
+      "category": "alias"
+    },
+    "round.l.d": {
+      "description": "Round to nearest, with ties to even: convert a double-precision float to a signed 64-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "round.l.s": {
+      "description": "Round to nearest, with ties to even: convert a single-precision float to a signed 64-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "round.w.d": {
+      "description": "Round to nearest, with ties to even: convert a double-precision float to a signed 32-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "round.w.s": {
+      "description": "Round to nearest, with ties to even: convert a single-precision float to a signed 32-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "s.d": {
+      "description": "Store 64 bits from an FPU register into memory. Assembler alias.",
+      "category": "alias"
+    },
+    "s.s": {
+      "description": "Store 32 bits from an FPU register into memory. Assembler alias.",
+      "category": "alias"
+    },
+    "sb": {
+      "description": "Store the low 8 bits of a register at the base-register-plus-signed-offset memory address.",
+      "category": "memory"
+    },
+    "sc": {
+      "description": "Attempt a conditional store after a linked load; replace the source register with 1 for success or 0 for failure. SC stores 32 bits; SCD stores 64 bits.",
+      "category": "memory"
+    },
+    "scd": {
+      "description": "Attempt a conditional store after a linked load; replace the source register with 1 for success or 0 for failure. SC stores 32 bits; SCD stores 64 bits.",
+      "category": "memory"
+    },
+    "sd": {
+      "description": "Store all 64 bits of a register at the base-register-plus-signed-offset memory address.",
+      "category": "memory"
+    },
+    "sdc1": {
+      "description": "Store 64 bits from an FPU register into memory.",
+      "category": "floating-point"
+    },
+    "sdl": {
+      "description": "Store part of a 64-bit register value; paired stores can write an unaligned doubleword.",
+      "category": "memory"
+    },
+    "sdr": {
+      "description": "Store part of a 64-bit register value; paired stores can write an unaligned doubleword.",
+      "category": "memory"
+    },
+    "seq": {
+      "description": "Produce 1 if the first operand is equal to the second, otherwise 0; assembler macro.",
+      "category": "alias"
+    },
+    "sge": {
+      "description": "Produce 1 if the first operand is greater than or equal to the second, otherwise 0; assembler macro.",
+      "category": "alias"
+    },
+    "sgeu": {
+      "description": "Unsigned comparison producing 1 if the first operand is greater than or equal to the second, otherwise 0; assembler macro.",
+      "category": "alias"
+    },
+    "sgt": {
+      "description": "Produce 1 if the first operand is greater than the second, otherwise 0; assembler macro.",
+      "category": "alias"
+    },
+    "sgtu": {
+      "description": "Unsigned comparison producing 1 if the first operand is greater than the second, otherwise 0; assembler macro.",
+      "category": "alias"
+    },
+    "sh": {
+      "description": "Store the low 16 bits of a register at the base-register-plus-signed-offset memory address.",
+      "category": "memory"
+    },
+    "sle": {
+      "description": "Produce 1 if the first operand is less than or equal to the second, otherwise 0; assembler macro.",
+      "category": "alias"
+    },
+    "sleu": {
+      "description": "Unsigned comparison producing 1 if the first operand is less than or equal to the second, otherwise 0; assembler macro.",
+      "category": "alias"
+    },
+    "sll": {
+      "description": "Shift left, filling with zeros; use an immediate shift count on a 32-bit value.",
+      "category": "integer"
+    },
+    "sllv": {
+      "description": "Shift left, filling with zeros; take the shift count from a register for a 32-bit value.",
+      "category": "integer"
+    },
+    "slt": {
+      "description": "Write 1 if the first register is less than the second using signed comparison; otherwise write 0.",
+      "category": "integer"
+    },
+    "slti": {
+      "description": "Compare a register with a sign-extended immediate as signed integers, producing 1 or 0.",
+      "category": "integer"
+    },
+    "sltiu": {
+      "description": "Compare a register with a sign-extended immediate as unsigned values, producing 1 or 0.",
+      "category": "integer"
+    },
+    "sltu": {
+      "description": "Write 1 if the first register is less than the second using unsigned comparison; otherwise write 0.",
+      "category": "integer"
+    },
+    "sne": {
+      "description": "Produce 1 if the first operand is not equal to the second, otherwise 0; assembler macro.",
+      "category": "alias"
+    },
+    "sqrt.d": {
+      "description": "Compute the square root of a double-precision floating-point value.",
+      "category": "floating-point"
+    },
+    "sqrt.s": {
+      "description": "Compute the square root of a single-precision floating-point value.",
+      "category": "floating-point"
+    },
+    "sra": {
+      "description": "Shift right, copying the sign bit; use an immediate shift count on a 32-bit value.",
+      "category": "integer"
+    },
+    "srav": {
+      "description": "Shift right, copying the sign bit; take the shift count from a register for a 32-bit value.",
+      "category": "integer"
+    },
+    "srl": {
+      "description": "Shift right, filling with zeros; use an immediate shift count on a 32-bit value.",
+      "category": "integer"
+    },
+    "srlv": {
+      "description": "Shift right, filling with zeros; take the shift count from a register for a 32-bit value.",
+      "category": "integer"
+    },
+    "sub": {
+      "description": "Subtract 32-bit integers; signed overflow raises an exception.",
+      "category": "integer"
+    },
+    "sub.d": {
+      "description": "Subtract two double-precision floating-point values.",
+      "category": "floating-point"
+    },
+    "sub.s": {
+      "description": "Subtract two single-precision floating-point values.",
+      "category": "floating-point"
+    },
+    "subu": {
+      "description": "Subtract 32-bit integers without an overflow exception.",
+      "category": "integer"
+    },
+    "sw": {
+      "description": "Store the low 32 bits of a register at the base-register-plus-signed-offset memory address.",
+      "category": "memory"
+    },
+    "swc1": {
+      "description": "Store 32 bits from an FPU register into memory.",
+      "category": "floating-point"
+    },
+    "swl": {
+      "description": "Store part of a 32-bit register value; paired stores can write an unaligned word.",
+      "category": "memory"
+    },
+    "swr": {
+      "description": "Store part of a 32-bit register value; paired stores can write an unaligned word.",
+      "category": "memory"
+    },
+    "sync": {
+      "description": "Order memory operations before and after this synchronization point.",
+      "category": "system"
+    },
+    "syscall": {
+      "description": "Raise a system-call exception.",
+      "category": "system"
+    },
+    "teq": {
+      "description": "Raise a trap exception when two registers compare equal.",
+      "category": "system"
+    },
+    "teqi": {
+      "description": "Raise a trap exception when a register and a sign-extended immediate compare equal.",
+      "category": "system"
+    },
+    "tge": {
+      "description": "Raise a trap exception when two registers compare greater than or equal, signed.",
+      "category": "system"
+    },
+    "tgei": {
+      "description": "Raise a trap exception when a register and a sign-extended immediate compare greater than or equal, signed.",
+      "category": "system"
+    },
+    "tgeiu": {
+      "description": "Raise a trap exception when a register and a sign-extended immediate compare greater than or equal, unsigned.",
+      "category": "system"
+    },
+    "tgeu": {
+      "description": "Raise a trap exception when two registers compare greater than or equal, unsigned.",
+      "category": "system"
+    },
+    "tlbp": {
+      "description": "Probe the translation lookaside buffer for a matching entry.",
+      "category": "system"
+    },
+    "tlbr": {
+      "description": "Read the indexed translation lookaside buffer entry into CP0 registers.",
+      "category": "system"
+    },
+    "tlbwi": {
+      "description": "Write CP0 translation registers into the indexed TLB entry.",
+      "category": "system"
+    },
+    "tlbwr": {
+      "description": "Write CP0 translation registers into a randomly selected TLB entry.",
+      "category": "system"
+    },
+    "tlt": {
+      "description": "Raise a trap exception when two registers compare less than, signed.",
+      "category": "system"
+    },
+    "tlti": {
+      "description": "Raise a trap exception when a register and a sign-extended immediate compare less than, signed.",
+      "category": "system"
+    },
+    "tltiu": {
+      "description": "Raise a trap exception when a register and a sign-extended immediate compare less than, unsigned.",
+      "category": "system"
+    },
+    "tltu": {
+      "description": "Raise a trap exception when two registers compare less than, unsigned.",
+      "category": "system"
+    },
+    "tne": {
+      "description": "Raise a trap exception when two registers compare not equal.",
+      "category": "system"
+    },
+    "tnei": {
+      "description": "Raise a trap exception when a register and a sign-extended immediate compare not equal.",
+      "category": "system"
+    },
+    "trunc.l.d": {
+      "description": "Round toward zero: convert a double-precision float to a signed 64-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "trunc.l.s": {
+      "description": "Round toward zero: convert a single-precision float to a signed 64-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "trunc.w.d": {
+      "description": "Round toward zero: convert a double-precision float to a signed 32-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "trunc.w.s": {
+      "description": "Round toward zero: convert a single-precision float to a signed 32-bit integer stored in an FPU register.",
+      "category": "floating-point"
+    },
+    "uld": {
+      "description": "Load an unaligned 64-bit doubleword using an assembler macro.",
+      "category": "alias"
+    },
+    "ulh": {
+      "description": "Load an unaligned halfword with sign extension using an assembler macro.",
+      "category": "alias"
+    },
+    "ulhu": {
+      "description": "Load an unaligned halfword with zero extension using an assembler macro.",
+      "category": "alias"
+    },
+    "ulw": {
+      "description": "Load an unaligned 32-bit word using an assembler macro.",
+      "category": "alias"
+    },
+    "usd": {
+      "description": "Store an unaligned 64-bit doubleword using an assembler macro.",
+      "category": "alias"
+    },
+    "ush": {
+      "description": "Store an unaligned halfword using an assembler macro.",
+      "category": "alias"
+    },
+    "usw": {
+      "description": "Store an unaligned 32-bit word using an assembler macro.",
+      "category": "alias"
+    },
+    "xor": {
+      "description": "Compute the bitwise exclusive OR of two registers.",
+      "category": "integer"
+    },
+    "xori": {
+      "description": "Compute bitwise exclusive OR with a zero-extended 16-bit immediate.",
+      "category": "integer"
+    }
+  }
+}

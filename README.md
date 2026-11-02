@@ -83,3 +83,7 @@ The instruction diff runs pinned GNU objdump WASM locally over the selected ROM 
 Assembly and the candidate side of the instruction diff display `# C:line source` comments when the selected compiler flags emit GCC line information. Comments use the compiled source snapshot, excluding host context lines. Optimized code may combine/reorder source statements; this is compiler attribution, not a one-to-one causal mapping. Missing debug information leaves instructions unannotated, without changing compiler flags or inventing target source.
 
 The compiler selector above Compile & check uses host-offered variations from the task packet. The active host profile is selected initially; changing it invalidates the old compiled result. Older desktop versions that do not send variations show only the current profile. Host verification receives the selected variation ID and may publish exact function-local settings after independently checking them.
+
+### Instruction help
+
+`src/data/mips-instructions.json` is the editable reference for N64 CPU / MIPS III mnemonics and common GNU assembler aliases. It includes brief descriptions, categories, branch delay-slot behavior and source links to the NEC VR4300 manual and GNU binutils documentation. Hover over an underlined mnemonic in assembly/diff views for a description; gutter difference popups also explain the target and compiled instructions. The separate RSP vector instruction set is outside this CPU compiler workflow. Unknown mnemonics receive no invented explanation.
