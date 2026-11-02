@@ -13,10 +13,17 @@ class DifferenceMarker extends GutterMarker {
  toDOM(){
   const button=document.createElement('button'),entry=this.entry;button.type='button';button.className=`source-diff-marker marker-${entry.kind}`;button.textContent=entry.kind==='operands'?'≠':entry.kind==='moved'?'↕':'!';button.setAttribute('aria-label',`Assembly differences for C line ${entry.line}`);
   let tooltip=null,timer;
-  const hide=()=>{clearTimeout(timer);tooltip?.remove();tooltip=null;button.removeAttribute('aria-describedby');};
+  const onScroll=e=>{if(!tooltip?.contains(e.target))hide();};
+  const hide=()=>{document.removeEventListener('scroll',onScroll,true);window.removeEventListener('resize',hide);clearTimeout(timer);tooltip?.remove();tooltip=null;button.removeAttribute('aria-describedby');};
   const show=()=>{clearTimeout(timer);if(tooltip)return;tooltip=document.createElement('div');tooltip.className='source-diff-tooltip';tooltip.id=`source-diff-tooltip-${++tooltipId}`;tooltip.setAttribute('role','tooltip');button.setAttribute('aria-describedby',tooltip.id);const heading=document.createElement('strong');heading.textContent=`C line ${entry.line} · ${entry.count} differing instruction${entry.count===1?'':'s'}`;const description=document.createElement('p');description.textContent=meaning[entry.kind];tooltip.append(heading,description);
    for(const instruction of entry.instructions){const row=document.createElement('div');row.className=`source-tooltip-row marker-${instruction.kind}`;const label=document.createElement('p');label.textContent=meaning[instruction.kind];row.append(label);for(const [name,insn] of [['Target',instruction.target],['Compiled',instruction.candidate]]){const caption=document.createElement('span');caption.className='source-tooltip-caption';caption.textContent=name;const code=document.createElement('pre');highlightAssembly(code,insn?`${insn.address.toString(16).toUpperCase()}  ${insn.word}  ${insn.text}`:'— no instruction —');row.append(caption,code);}tooltip.append(row);}
-   tooltip.onmouseenter=()=>clearTimeout(timer);tooltip.onmouseleave=()=>{timer=setTimeout(hide,100);};document.body.append(tooltip);const rect=button.getBoundingClientRect();tooltip.style.left=`${Math.max(8,Math.min(rect.right+10,innerWidth-tooltip.offsetWidth-8))}px`;tooltip.style.top=`${Math.max(8,Math.min(rect.top,innerHeight-tooltip.offsetHeight-8))}px`;
+   tooltip.onmouseenter=()=>clearTimeout(timer);tooltip.onmouseleave=()=>{timer=setTimeout(hide,100);};document.body.append(tooltip);const rect=button.getBoundingClientRect(),line=button.parentElement.getBoundingClientRect(),gap=8;
+   const below=Math.max(0,innerHeight-line.bottom-gap-8),above=Math.max(0,line.top-gap-8);
+   const placeBelow=tooltip.offsetHeight<=below||below>=above;
+   tooltip.style.maxHeight=`${Math.min(440,placeBelow?below:above)}px`;
+   tooltip.style.left=`${Math.max(8,Math.min(rect.right+10,innerWidth-tooltip.offsetWidth-8))}px`;
+   tooltip.style.top=`${placeBelow?line.bottom+gap:line.top-gap-tooltip.offsetHeight}px`;
+   document.addEventListener('scroll',onScroll,true);window.addEventListener('resize',hide);
   };
   button.onmouseenter=show;button.onfocus=show;button.onmouseleave=()=>{timer=setTimeout(hide,100);};button.onblur=hide;button.onclick=show;button.onkeydown=e=>{if(e.key==='Escape'){e.stopPropagation();hide();}};button.disposeTooltip=hide;return button;
  }
