@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "note": "These are common explanations and investigation hints, not a diagnosis of the original C source.",
+  "sources": [
+    {"title":"MIPS ABI Supplement: register conventions","url":"https://refspecs.linuxfoundation.org/elf/mipsabi.pdf"},
+    {"title":"GCC optimization options: register pressure and live ranges","url":"https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html"}
+  ],
+  "hints": {
+    "register": {"cause":"Often register allocation: the compiler kept the value in a different physical register. Temporary lifetimes, expression order, surrounding calls and optimization settings can affect this choice.","check":"Trace where the tested value is produced in both versions. Compare local types, expression structure and compiler flags. Renaming a C variable does not directly select its register."},
+    "valueRegisters": {"cause":"v0 and v1 can hold expression results and return values under the usual MIPS calling convention. Seeing v1 instead of v0 here does not by itself establish a different return type.","check":"Inspect the instructions that produce the value and any preceding call before changing the C."},
+    "fixedRegister": {"cause":"A fixed-purpose register changed, so this may change the value or address being used rather than merely rename a temporary. zero is constant zero; sp is the stack pointer; gp is the global pointer; ra holds a return address.","check":"Verify the value/address provenance, calling convention and context before assuming the change is harmless."},
+    "stackOffset": {"cause":"Different stack offsets often reflect a different frame layout: local sizes/order, alignment, spills, saved registers or outgoing call arguments.","check":"Compare the stack-frame allocation and neighboring loads/stores, then check local types and compiler settings."},
+    "memoryOffset": {"cause":"A changed memory offset can come from a different structure field, array index, element size, pointer type or symbol address.","check":"Check declarations and address calculations, including relocation/symbol information. Do not assume a register-only difference."},
+    "globalPointer": {"cause":"A changed gp-relative offset can reflect small-data placement or symbol/global-pointer settings.","check":"Check the host symbol addresses, global-pointer setup and -G compiler settings."},
+    "branchTarget": {"cause":"Different branch/jump destinations can reflect code layout, added/removed instructions or a different control-flow path.","check":"Compare destination blocks and relative displacements. A changed printed address alone does not prove the condition is wrong."},
+    "immediate": {"cause":"A changed constant can come from literal values, type width/signedness, structure layout, address relocation or optimizer transformations.","check":"Check how this instruction uses the constant and trace the corresponding C expression before editing a literal."},
+    "encoding": {"cause":"The decoded text is the same, but the machine words differ. A hidden encoding field, alias or disassembler formatting may conceal the distinction.","check":"Inspect the raw instruction words and compiler/assembler settings; identical printed text is not an exact byte match."}
+  }
+}

@@ -87,3 +87,5 @@ The compiler selector above Compile & check uses host-offered variations from th
 ### Instruction help
 
 `src/data/mips-instructions.json` is the editable reference for N64 CPU / MIPS III mnemonics and common GNU assembler aliases. It includes brief descriptions, categories, branch delay-slot behavior and source links to the NEC VR4300 manual and GNU binutils documentation. Hover over an underlined mnemonic in assembly/diff views for a description; gutter difference popups also explain the target and compiled instructions. The separate RSP vector instruction set is outside this CPU compiler workflow. Unknown mnemonics receive no invented explanation.
+
+Operand-specific explanations live in `src/data/operand-hints.json`. Gutter popups distinguish register allocation hints (including v0/v1), fixed-purpose registers, stack offsets, data/global-pointer offsets, branch destinations and constants. Observed operand differences are stated separately from common causes and suggested checks; the popup does not infer the original source or prove semantic equivalence.
